@@ -1,4 +1,5 @@
 // Corre el monitoreo del día: node src/monitor.js [--only falabella,ripley]
+// MONITOR_RUNNER=github|local corre solo los sitios de ese runner ("runner" en sites.json, por defecto github).
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { chromium } from 'playwright';
@@ -11,12 +12,15 @@ import { ROOT, OUT_DIR, DATA_DIR, SHOTS_DIR, limaDate, loadConfig, findPreviousD
 const args = process.argv.slice(2);
 const onlyIdx = args.indexOf('--only');
 const only = onlyIdx >= 0 ? args[onlyIdx + 1]?.split(',') : null;
+const runner = process.env.MONITOR_RUNNER || null;
 
 const UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36';
 
 async function main() {
   const { settings, sites: allSites } = await loadConfig();
-  const sites = allSites.filter((s) => s.enabled !== false && (!only || only.includes(s.id)));
+  const sites = allSites.filter(
+    (s) => s.enabled !== false && (!only || only.includes(s.id)) && (!runner || (s.runner || 'github') === runner)
+  );
   const date = limaDate();
   const shotsDir = path.join(SHOTS_DIR, date);
   await fs.mkdir(shotsDir, { recursive: true });
@@ -24,10 +28,15 @@ async function main() {
 
   const outFile = path.join(DATA_DIR, `${date}.json`);
   const previous = await findPreviousDay(date);
-  // Si se corre con --only, conserva los demás sitios ya capturados hoy.
-  const existing = only ? JSON.parse(await fs.readFile(outFile, 'utf8').catch(() => 'null')) : null;
+  // Conserva los sitios ya capturados hoy que esta corrida no visita (--only, u otro runner).
+  const existing = JSON.parse(await fs.readFile(outFile, 'utf8').catch(() => 'null'));
+  const lastRunFile = path.join(OUT_DIR, '.last-run.json');
 
-  console.log(`Monitoreo ${date} · ${sites.length} sitios · comparando con ${previous?.date ?? '(sin día anterior)'}`);
+  console.log(`Monitoreo ${date} · ${sites.length} sitios${runner ? ` (${runner})` : ''} · comparando con ${previous?.date ?? '(sin día anterior)'}`);
+  if (!sites.length) {
+    await fs.writeFile(lastRunFile, JSON.stringify({ date, sites: [] }));
+    return;
+  }
 
   const browser = await chromium.launch({
     headless: true,
@@ -98,6 +107,7 @@ async function main() {
       id: site.id,
       name: site.name,
       url: site.url,
+      capturedBy: process.env.GITHUB_ACTIONS ? 'github' : 'local',
       finalUrl: cap.finalUrl ?? null,
       status: cap.status,
       httpStatus: cap.httpStatus ?? null,
@@ -131,10 +141,11 @@ async function main() {
   await ocr.terminate();
   await browser.close();
 
-  const merged = existing
-    ? [...existing.sites.filter((s) => !results.some((r) => r.id === s.id)), ...results]
-    : results;
   const order = allSites.map((s) => s.id);
+  const merged = [
+    ...(existing?.sites || []).filter((s) => order.includes(s.id) && !results.some((r) => r.id === s.id)),
+    ...results,
+  ];
   merged.sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
 
   const out = {
@@ -144,6 +155,8 @@ async function main() {
     sites: merged,
   };
   await fs.writeFile(outFile, JSON.stringify(out, null, 1));
+  // Para src/publish.js: qué sitios capturó esta corrida.
+  await fs.writeFile(lastRunFile, JSON.stringify({ date, sites: results.map((r) => r.id) }));
   await buildIndex();
   console.log(`Guardado ${path.relative(OUT_DIR, outFile)}`);
 }

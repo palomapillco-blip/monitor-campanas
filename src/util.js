@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 // OUT_DIR permite escribir datos y capturas fuera del repo (en GitHub Actions es la carpeta de la rama gh-pages).
@@ -19,8 +19,8 @@ export async function loadConfig() {
   return JSON.parse(await fs.readFile(path.join(ROOT, 'sites.json'), 'utf8'));
 }
 
-export async function listDates() {
-  const files = await fs.readdir(DATA_DIR).catch(() => []);
+export async function listDates(dataDir = DATA_DIR) {
+  const files = await fs.readdir(dataDir).catch(() => []);
   return files.filter((f) => DATE_FILE_RE.test(f)).map((f) => f.slice(0, 10)).sort();
 }
 
@@ -29,4 +29,9 @@ export async function findPreviousDay(date) {
   const prev = (await listDates()).filter((d) => d < date).pop();
   if (!prev) return null;
   return { date: prev, data: JSON.parse(await fs.readFile(path.join(DATA_DIR, `${prev}.json`), 'utf8')) };
+}
+
+// Para los scripts que también se importan: true si este archivo es el que se ejecutó con node.
+export function isMain(metaUrl) {
+  return process.argv[1] && metaUrl === pathToFileURL(path.resolve(process.argv[1])).href;
 }

@@ -45,6 +45,25 @@ El workflow corre todos los días a las 7:30 a. m. (Lima). Los datos y capturas 
 como un único commit, así el repo no crece con las imágenes; las capturas de más de `keepScreenshotsDays` días se borran,
 los JSON se conservan siempre. Para cambiar la hora edita el `cron` en `.github/workflows/monitor.yml` (está en UTC: Lima = UTC−5).
 
+## Sitios que se capturan desde el Mac (Ripley)
+
+Algunos sitios bloquean las visitas desde los servidores de GitHub (Ripley responde con la verificación de
+Cloudflare). Esos sitios llevan `"runner": "local"` en `sites.json`: GitHub Actions los salta y los captura
+una tarea diaria en el Mac, que los publica en la misma rama `gh-pages` sin pisar lo que publicó GitHub
+(y viceversa: `src/publish.js` mezcla por tienda y reintenta si las dos corridas coinciden).
+
+```bash
+./scripts/install-mac-schedule.sh          # instala la tarea diaria (7:00 a. m.; otra hora: 06:30)
+launchctl kickstart gui/$(id -u)/pe.monitor-campanas.local   # correrla ahora
+tail -f .cache/local-run.log               # ver qué pasó
+./scripts/install-mac-schedule.sh --uninstall
+npm run monitor:local                      # lo mismo, a mano
+```
+
+Si el Mac está dormido a esa hora, macOS la corre al despertar; si está apagado todo el día, ese día Ripley
+no aparece. La tarea usa la ruta de `node` del momento de instalarla: si cambias de versión con nvm, vuelve a correr
+el instalador.
+
 ## Limitaciones a tener en cuenta
 
 - GitHub Actions corre desde servidores en EE. UU. Algunos sitios pueden bloquear la visita o mostrar otra versión;
