@@ -1,0 +1,19 @@
+{
+  "name": "monitor-ecommerce-pe",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Monitor diario de las homes de ecommerce peruanos en campañas",
+  "scripts": {
+    "monitor": "node src/monitor.js",
+    "monitor:site": "node src/monitor.js --only",
+    "reindex": "node src/build-index.js",
+    "prune": "node src/prune.js",
+    "test:signals": "node src/test-signals.js",
+    "serve": "node src/serve.js"
+  },
+  "dependencies": {
+    "playwright": "^1.49.0",
+    "tesseract.js": "^5.1.1"
+  }
+}

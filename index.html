@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="es-PE">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Monitor de campañas · Ecommerce Perú</title>
+  <meta name="description" content="Seguimiento diario de las homes de los principales ecommerce peruanos durante campañas.">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <header class="top">
+    <div class="wrap top-row">
+      <div>
+        <h1>Monitor de campañas</h1>
+        <p class="sub">Homes de ecommerce peruanos · captura diaria automática</p>
+      </div>
+      <nav class="daynav" aria-label="Día">
+        <button id="prevDay" aria-label="Día anterior">‹</button>
+        <select id="daySelect" aria-label="Elegir día"></select>
+        <button id="nextDay" aria-label="Día siguiente">›</button>
+      </nav>
+    </div>
+    <div class="wrap">
+      <nav class="tabs" role="tablist">
+        <button role="tab" data-tab="resumen">Resumen</button>
+        <button role="tab" data-tab="tiendas">Tiendas</button>
+        <button role="tab" data-tab="cambios">Cambios</button>
+        <button role="tab" data-tab="historial">Historial</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <p id="meta" class="meta"></p>
+    <section id="kpis" class="kpis"></section>
+    <section id="view"></section>
+  </main>
+
+  <dialog id="shot">
+    <form method="dialog"><button class="close" aria-label="Cerrar">×</button></form>
+    <div class="shot-head"><strong id="shotTitle"></strong> <a id="shotLink" target="_blank" rel="noopener">abrir imagen</a></div>
+    <div class="shot-body"><img id="shotImg" alt=""></div>
+  </dialog>
+
+  <footer class="wrap foot">
+    Datos detectados automáticamente con reglas y OCR: pueden tener errores. Revisa siempre la captura.
+  </footer>
+  <script src="assets/app.js" type="module"></script>
+</body>
+</html>

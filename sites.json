@@ -1,0 +1,26 @@
+{
+  "settings": {
+    "viewport": { "width": 1440, "height": 900 },
+    "locale": "es-PE",
+    "timezoneId": "America/Lima",
+    "fullPageMaxHeight": 4000,
+    "jpegQuality": 70,
+    "navigationTimeoutMs": 60000,
+    "settleMs": 4000,
+    "ocrLang": "spa",
+    "keepScreenshotsDays": 45
+  },
+  "sites": [
+    { "id": "falabella", "name": "Falabella", "url": "https://www.falabella.com.pe/falabella-pe" },
+    { "id": "ripley", "name": "Ripley", "url": "https://simple.ripley.com.pe/" },
+    { "id": "wong", "name": "Wong", "url": "https://www.wong.pe/" },
+    { "id": "tottus", "name": "Tottus", "url": "https://www.tottus.com.pe/" },
+    { "id": "sodimac", "name": "Sodimac", "url": "https://www.sodimac.com.pe/sodimac-pe/" },
+    { "id": "mercadolibre", "name": "Mercado Libre", "url": "https://www.mercadolibre.com.pe/" },
+    { "id": "plazavea", "name": "plazaVea", "url": "https://www.plazavea.com.pe/" },
+    { "id": "oechsle", "name": "Oechsle", "url": "https://www.oechsle.pe/" },
+    { "id": "promart", "name": "Promart", "url": "https://www.promart.pe/" },
+    { "id": "inkafarma", "name": "Inkafarma", "url": "https://inkafarma.pe/" },
+    { "id": "mifarma", "name": "Mifarma", "url": "https://www.mifarma.com.pe/" }
+  ]
+}

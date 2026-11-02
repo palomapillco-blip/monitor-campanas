@@ -1,0 +1,10 @@
+node_modules/
+.cache/
+_site/
+.DS_Store
+.claude/
+
+# Corridas locales: en GitHub Actions los datos y capturas se publican en la rama gh-pages.
+/data/
+/screenshots/
+/site/
