@@ -21,11 +21,11 @@
     { "id": "metro", "name": "Metro", "url": "https://www.metro.pe/" },
     { "id": "coolbox", "name": "Coolbox", "url": "https://www.coolbox.pe/" },
     { "id": "hiraoka", "name": "Hiraoka", "url": "https://hiraoka.com.pe/" },
-    { "id": "lacuracao", "name": "La Curacao", "url": "https://www.lacuracao.pe/" },
-    { "id": "efe", "name": "Efe", "url": "https://www.efe.com.pe/" },
+    { "id": "lacuracao", "name": "La Curacao", "url": "https://www.lacuracao.pe/", "runner": "local" },
+    { "id": "efe", "name": "Efe", "url": "https://www.efe.com.pe/", "runner": "local" },
     { "id": "boticasysalud", "name": "Boticas y Salud", "url": "https://www.boticasysalud.com/" },
     { "id": "farmaciauniversal", "name": "Farmacia Universal", "url": "https://www.farmaciauniversal.com/" },
     { "id": "estilos", "name": "Estilos", "url": "https://www.estilos.com.pe/" },
-    { "id": "platanitos", "name": "Platanitos", "url": "https://platanitos.com/pe" }
+    { "id": "platanitos", "name": "Platanitos", "url": "https://platanitos.com/pe", "runner": "local" }
   ]
 }

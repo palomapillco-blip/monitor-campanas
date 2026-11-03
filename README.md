@@ -47,10 +47,10 @@ así que tiene dos horarios de respaldo (9:15 y 11:10 a. m.) que solo capturan s
 como un único commit, así el repo no crece con las imágenes; las capturas de más de `keepScreenshotsDays` días se borran,
 los JSON se conservan siempre. Para cambiar las horas edita los `cron` en `.github/workflows/monitor.yml` (están en UTC: Lima = UTC−5).
 
-## Sitios que se capturan desde el Mac (Ripley)
+## Sitios que se capturan desde el Mac (Ripley, La Curacao, Efe, Platanitos)
 
 Algunos sitios bloquean las visitas desde los servidores de GitHub (Ripley responde con la verificación de
-Cloudflare). Esos sitios llevan `"runner": "local"` en `sites.json`: GitHub Actions los salta y los captura
+Cloudflare; La Curacao y Efe con 426 y Platanitos con 403). Esos sitios llevan `"runner": "local"` en `sites.json`: GitHub Actions los salta y los captura
 una tarea diaria en el Mac, que los publica en la misma rama `gh-pages` sin pisar lo que publicó GitHub
 (y viceversa: `src/publish.js` mezcla por tienda y reintenta si las dos corridas coinciden).
 
@@ -62,8 +62,8 @@ tail -f .cache/local-run.log               # ver qué pasó
 npm run monitor:local                      # lo mismo, a mano
 ```
 
-Si el Mac está dormido a esa hora, macOS la corre al despertar; si está apagado todo el día, ese día Ripley
-no aparece. La tarea usa la ruta de `node` del momento de instalarla: si cambias de versión con nvm, vuelve a correr
+Si el Mac está dormido a esa hora, macOS la corre al despertar; si está apagado todo el día, ese día esas tiendas
+no aparecen. La tarea usa la ruta de `node` del momento de instalarla: si cambias de versión con nvm, vuelve a correr
 el instalador.
 
 ## Descargas
