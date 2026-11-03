@@ -78,6 +78,20 @@ h1 { font-size: 20px; margin: 0; letter-spacing: -0.01em; }
   border-radius: 8px; padding: 6px 10px; font: inherit; cursor: pointer;
 }
 .daynav button:disabled { opacity: .4; cursor: default; }
+.dl { position: relative; }
+.dl summary { list-style: none; }
+.dl summary::-webkit-details-marker { display: none; }
+.dl-menu {
+  position: absolute; right: 0; top: calc(100% + 6px); z-index: 10; display: grid; gap: 2px; padding: 6px;
+  width: min(280px, calc(100vw - 32px)); background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+  box-shadow: 0 8px 24px rgb(0 0 0 / .18);
+}
+.daynav .dl-menu a, .daynav .dl-menu button {
+  display: block; width: 100%; text-align: left; padding: 8px 10px; border: 0; border-radius: 8px;
+  background: none; color: var(--text); font: inherit; font-weight: 600; text-decoration: none; cursor: pointer;
+}
+.daynav .dl-menu a:hover, .daynav .dl-menu button:hover { background: var(--surface-2); }
+.dl-menu span { display: block; color: var(--muted); font-size: 12px; font-weight: 400; }
 .tabs { display: flex; gap: 4px; margin-top: 10px; overflow-x: auto; }
 .tabs button {
   background: none; border: none; border-bottom: 2px solid transparent; color: var(--muted);

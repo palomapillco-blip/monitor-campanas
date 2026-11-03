@@ -66,12 +66,15 @@ Si el Mac está dormido a esa hora, macOS la corre al despertar; si está apagad
 no aparece. La tarea usa la ruta de `node` del momento de instalarla: si cambias de versión con nvm, vuelve a correr
 el instalador.
 
-## Reporte descargable
+## Descargas
 
-El botón **Descargar** del dashboard baja el día que estás viendo en un solo archivo HTML
-(`monitor-campanas-AAAA-MM-DD.html`, unos 2 MB). Trae el resumen, los cambios y cada tienda con su captura incrustada,
-así que se puede mandar por WhatsApp o correo y abrir sin internet; la página completa de cada tienda se abre en línea.
-También se puede imprimir o guardar como PDF desde el navegador.
+El botón **Descargar** del dashboard ofrece dos archivos:
+
+- **Excel** (`data/monitor-campanas.xlsx`): todo el historial, con la pestaña **Tiendas por día** (una fila por tienda
+  y día) y **Cambios** (una fila por cada mecánica que apareció o salió). Lo genera `src/build-index.js` cada vez
+  que se publica, con las mismas columnas que la hoja de Google Sheets de abajo.
+- **Reporte del día**: el día que estás viendo en un solo archivo HTML (unos 2 MB) con el resumen, los cambios y cada
+  tienda con su captura incrustada. Se puede mandar por WhatsApp o correo, abrir sin internet, o imprimir como PDF.
 
 ## Google Sheets
 

@@ -8,7 +8,8 @@
     "navigationTimeoutMs": 60000,
     "settleMs": 4000,
     "ocrLang": "spa",
-    "keepScreenshotsDays": 45
+    "keepScreenshotsDays": 45,
+    "publicUrl": "https://denv17.github.io/monitor-campanas/"
   },
   "sites": [
     { "id": "falabella", "name": "Falabella", "url": "https://www.falabella.com.pe/falabella-pe" },

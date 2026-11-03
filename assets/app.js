@@ -51,7 +51,7 @@ async function init() {
   try {
     state.index = await loadJSON('data/index.json');
   } catch {
-    $('#download').hidden = true;
+    $('#dlMenu').hidden = true;
     $('#view').innerHTML = `<div class="panel empty">Todavía no hay datos. Corre <code>npm run monitor</code> o espera la primera ejecución diaria.</div>`;
     return;
   }
@@ -66,6 +66,16 @@ async function init() {
   $('#prevDay').onclick = () => go(dates[dates.indexOf(state.date) - 1]);
   $('#nextDay').onclick = () => go(dates[dates.indexOf(state.date) + 1]);
   $('#download').onclick = downloadReport;
+  // El Excel lo arma el publicador junto con index.json; el ?v= evita bajar una copia vieja de la caché.
+  const excel = $('#dlExcel');
+  if (state.index.workbook) {
+    excel.href = `${state.index.workbook}?v=${encodeURIComponent(state.index.updatedAt)}`;
+    excel.download = `monitor-campanas-al-${state.index.latest}.xlsx`;
+    excel.onclick = () => ($('#dlMenu').open = false);
+  } else {
+    excel.remove();
+  }
+  document.addEventListener('click', (e) => { if (!e.target.closest('#dlMenu')) $('#dlMenu').open = false; });
   document.querySelectorAll('.tabs button').forEach((b) => (b.onclick = () => { state.tab = b.dataset.tab; render(); }));
   window.addEventListener('hashchange', () => {
     const n = readHash();
@@ -346,9 +356,9 @@ export async function buildReportHtml(day = state.day) {
 
 async function downloadReport() {
   const btn = $('#download');
-  const label = btn.textContent;
+  const label = btn.innerHTML;
   btn.disabled = true;
-  btn.textContent = 'Preparando…';
+  btn.innerHTML = 'Preparando…<span>Juntando las capturas del día</span>';
   try {
     const url = URL.createObjectURL(new Blob([await buildReportHtml()], { type: 'text/html' }));
     const a = Object.assign(document.createElement('a'), { href: url, download: `monitor-campanas-${state.date}.html` });
@@ -360,7 +370,8 @@ async function downloadReport() {
     alert(`No se pudo armar el reporte: ${e.message}`);
   } finally {
     btn.disabled = false;
-    btn.textContent = label;
+    btn.innerHTML = label;
+    $('#dlMenu').open = false;
   }
 }
 

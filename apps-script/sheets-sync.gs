@@ -15,6 +15,8 @@
  * Trae todo el historial y deja una revisión automática cada hora. Para traer lo último al instante,
  * ejecuta "sincronizar". Si quieres tus propias columnas o fórmulas, ponlas en otra pestaña: estas dos
  * se reescriben en cada sincronización.
+ *
+ * Las columnas son las mismas que las del Excel del dashboard (src/workbook.js): si cambias una, cambia la otra.
  */
 
 const BASE_URL = 'https://denv17.github.io/monitor-campanas/';
