@@ -2,8 +2,11 @@ name: Monitor diario
 
 on:
   schedule:
-    # 12:30 UTC = 7:30 a. m. en Lima. GitHub puede retrasar los cron unos minutos.
-    - cron: '30 12 * * *'
+    # Horas en UTC (Lima = UTC−5). GitHub a veces atrasa o se salta una corrida programada,
+    # así que hay dos de respaldo: si la de las 7:30 ya capturó, las otras no hacen nada.
+    - cron: '30 12 * * *'   # 7:30 a. m.
+    - cron: '15 14 * * *'   # 9:15 a. m. (respaldo)
+    - cron: '10 16 * * *'   # 11:10 a. m. (respaldo)
   workflow_dispatch:
     inputs:
       only:
@@ -20,7 +23,8 @@ concurrency:
 
 jobs:
   monitor:
-    runs-on: ubuntu-latest
+    # Versión fija: ubuntu-latest pasa a Ubuntu 26 y Playwright podría no instalar sus dependencias ahí.
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
     env:
       OUT_DIR: site
@@ -28,14 +32,35 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Los datos y capturas viven en la rama gh-pages (que es la que sirve GitHub Pages).
+      - name: Traer historial publicado
+        id: published
+        run: |
+          mkdir -p site
+          if git fetch --depth=1 origin gh-pages; then
+            git archive FETCH_HEAD | tar -x -C site
+          fi
+          rm -f site/index.html && rm -rf site/assets
+          # Corrida de respaldo: si hoy ya se capturó alguna tienda de GitHub, no se vuelve a capturar.
+          today="site/data/$(date +%F).json"
+          if [ "${{ github.event_name }}" = schedule ] && [ -f "$today" ] && jq -e --slurpfile cfg sites.json '
+              ($cfg[0].sites | map(select((.runner // "github") == "github") | .id)) as $ids
+              | any(.sites[]; (.id | IN($ids[])) and .status != "error")' "$today" > /dev/null; then
+            echo "Hoy ya hay capturas de GitHub Actions: esta corrida de respaldo no hace nada."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: actions/setup-node@v4
+        if: steps.published.outputs.skip != 'true'
         with:
           node-version: 22
           cache: npm
 
-      - run: npm ci
+      - if: steps.published.outputs.skip != 'true'
+        run: npm ci
 
       - name: Cache de Playwright y del idioma de OCR
+        if: steps.published.outputs.skip != 'true'
         uses: actions/cache@v4
         with:
           path: |
@@ -43,18 +68,11 @@ jobs:
             .cache/tesseract
           key: deps-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
-      - run: npx playwright install --with-deps chromium
-
-      # Los datos y capturas viven en la rama gh-pages (que es la que sirve GitHub Pages).
-      - name: Traer historial publicado
-        run: |
-          mkdir -p site
-          if git fetch --depth=1 origin gh-pages; then
-            git archive FETCH_HEAD | tar -x -C site
-          fi
-          rm -f site/index.html && rm -rf site/assets
+      - if: steps.published.outputs.skip != 'true'
+        run: npx playwright install --with-deps chromium
 
       - name: Capturar homes
+        if: steps.published.outputs.skip != 'true'
         env:
           # Los sitios con "runner": "local" (p. ej. Ripley) los captura el Mac: ver src/local-run.js.
           MONITOR_RUNNER: github
@@ -67,6 +85,7 @@ jobs:
 
       # Mezcla con lo ya publicado (sin pisar lo que publicó el Mac) y sube un único commit sin historial.
       - name: Publicar en gh-pages
+        if: steps.published.outputs.skip != 'true'
         env:
           PUBLISH_REMOTE: https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
         run: node src/publish.js --from site

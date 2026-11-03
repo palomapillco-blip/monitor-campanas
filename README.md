@@ -41,9 +41,11 @@ Las palabras clave (tarjetas, bancos, campañas, categorías, urgencia) están a
 3. Cuando termine, ve a **Settings → Pages** → *Source: Deploy from a branch* → rama `gh-pages`, carpeta `/ (root)`.
 4. El dashboard queda en `https://<usuario>.github.io/<repo>/`. Ese link es el que compartes.
 
-El workflow corre todos los días a las 7:30 a. m. (Lima). Los datos y capturas se guardan en la rama `gh-pages`
+El workflow corre todos los días a las 7:30 a. m. (Lima). GitHub a veces atrasa o se salta una corrida programada,
+así que tiene dos horarios de respaldo (9:15 y 11:10 a. m.) que solo capturan si ese día todavía no hay datos de GitHub;
+**Run workflow** siempre captura. Los datos y capturas se guardan en la rama `gh-pages`
 como un único commit, así el repo no crece con las imágenes; las capturas de más de `keepScreenshotsDays` días se borran,
-los JSON se conservan siempre. Para cambiar la hora edita el `cron` en `.github/workflows/monitor.yml` (está en UTC: Lima = UTC−5).
+los JSON se conservan siempre. Para cambiar las horas edita los `cron` en `.github/workflows/monitor.yml` (están en UTC: Lima = UTC−5).
 
 ## Sitios que se capturan desde el Mac (Ripley)
 
