@@ -18,10 +18,14 @@
     { "id": "tottus", "name": "Tottus", "url": "https://www.tottus.com.pe/" },
     { "id": "sodimac", "name": "Sodimac", "url": "https://www.sodimac.com.pe/sodimac-pe/" },
     { "id": "mercadolibre", "name": "Mercado Libre", "url": "https://www.mercadolibre.com.pe/" },
-    { "id": "plazavea", "name": "plazaVea", "url": "https://www.plazavea.com.pe/" },
-    { "id": "oechsle", "name": "Oechsle", "url": "https://www.oechsle.pe/" },
-    { "id": "promart", "name": "Promart", "url": "https://www.promart.pe/" },
-    { "id": "inkafarma", "name": "Inkafarma", "url": "https://inkafarma.pe/" },
-    { "id": "mifarma", "name": "Mifarma", "url": "https://www.mifarma.com.pe/" }
+    { "id": "metro", "name": "Metro", "url": "https://www.metro.pe/" },
+    { "id": "coolbox", "name": "Coolbox", "url": "https://www.coolbox.pe/" },
+    { "id": "hiraoka", "name": "Hiraoka", "url": "https://hiraoka.com.pe/" },
+    { "id": "lacuracao", "name": "La Curacao", "url": "https://www.lacuracao.pe/" },
+    { "id": "efe", "name": "Efe", "url": "https://www.efe.com.pe/" },
+    { "id": "boticasysalud", "name": "Boticas y Salud", "url": "https://www.boticasysalud.com/" },
+    { "id": "farmaciauniversal", "name": "Farmacia Universal", "url": "https://www.farmaciauniversal.com/" },
+    { "id": "estilos", "name": "Estilos", "url": "https://www.estilos.com.pe/" },
+    { "id": "platanitos", "name": "Platanitos", "url": "https://platanitos.com/pe" }
   ]
 }

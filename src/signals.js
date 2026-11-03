@@ -30,6 +30,8 @@ const CAMPAIGNS = [
   ['Cyber Wow', /\bcyber\s*-?\s*wow\b/],
   ['Cyber Days', /\bcyber\s*days?\b/],
   ['Cyber Monday', /\bcyber\s*monday\b/],
+  // "Cyber" a secas (Estilos: "Cyber 2 al 8 Nov"); se descarta si también aparece el nombre completo.
+  ['Cyber', /\bcyber\b(?!\s*-?\s*(wow|days?|monday))/],
   ['Black Friday', /\bblack\s*friday\b/],
   ['Black Week', /\bblack\s*(week|days?|weekend|november)\b/],
   ['Navidad', /\b(navidad|navidena?s?|christmas|regalos de fin de ano)\b/],
@@ -53,6 +55,8 @@ const CARDS = [
   ['Tarjeta Oh!', /\btarjeta oh\b|\boh!/],
   ['Sip', /\bsip\b/],
   ['Wong Prime', /\bwong prime\b|\bprime\b(?=.{0,20}wong)/],
+  ['Tarjeta Cencosud', /\btarjeta cencosud\b|\bcencosud (scotiabank|visa|mastercard)\b/],
+  ['Tarjeta Estilos', /\btarjeta estilos\b/],
   ['Mercado Pago', /\bmercado pago\b/],
   ['Tarjeta Promart', /\btarjeta promart\b/],
   ['Monedero del Ahorro', /\bmonedero del ahorro\b/],
@@ -151,8 +155,10 @@ export function detectSignals(chunks) {
 
     // Campañas: el footer suele listar todas ("cyber wow, cyber days y black friday")
     // como texto SEO, así que el texto completo no cuenta; sí título, banners, alts y OCR.
+    // Tampoco cuenta una categoría del menú con nombre de campaña ("categoría Black Friday" en Hiraoka).
     for (const [label, re] of source === 'text' ? [] : CAMPAIGNS) {
-      const m = text.match(re);
+      const m = [...text.matchAll(new RegExp(re.source, 'g'))]
+        .find((x) => !/\bcategoria\s+(\S+\s+){0,3}$/.test(text.slice(Math.max(0, x.index - 40), x.index)));
       if (m) add({ type: 'campaign', key: `campaign:${label}`, value: label, label, snippet: snippetAround(text, m.index, m[0].length) }, source);
     }
     for (const [label, re] of CARDS) {
@@ -266,6 +272,8 @@ export function detectSignals(chunks) {
       add({ type: 'price', key: `price:${v}`, value: v, label: `S/ ${v.toLocaleString('es-PE', { minimumFractionDigits: v % 1 ? 2 : 0 })}`, snippet: snippetAround(text, m.index, m[0].length, 40) }, source);
     }
   }
+
+  if (['Cyber Wow', 'Cyber Days', 'Cyber Monday'].some((l) => found.has(`campaign:${l}`))) found.delete('campaign:Cyber');
 
   const signals = [...found.values()];
   const summary = summarize(signals);

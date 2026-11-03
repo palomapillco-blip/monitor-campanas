@@ -86,9 +86,12 @@ export async function removeBlockingOverlays(page) {
         removed++;
       }
     }
+    // Los modales suelen bloquear el scroll con overflow: hidden. Se vuelve a "visible" (no "auto"): con html y
+    // body en auto y una altura fija (p. ej. Hiraoka), el body pasa a ser una caja con scroll propio y la página
+    // queda de una pantalla de alto.
     if (removed) {
-      document.documentElement.style.overflow = 'auto';
-      document.body.style.overflow = 'auto';
+      document.documentElement.style.setProperty('overflow', 'visible', 'important');
+      document.body.style.setProperty('overflow', 'visible', 'important');
     }
     return removed;
   });
