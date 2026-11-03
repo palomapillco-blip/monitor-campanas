@@ -51,6 +51,7 @@ async function init() {
   try {
     state.index = await loadJSON('data/index.json');
   } catch {
+    $('#download').hidden = true;
     $('#view').innerHTML = `<div class="panel empty">Todavía no hay datos. Corre <code>npm run monitor</code> o espera la primera ejecución diaria.</div>`;
     return;
   }
@@ -64,6 +65,7 @@ async function init() {
   sel.onchange = () => go(sel.value);
   $('#prevDay').onclick = () => go(dates[dates.indexOf(state.date) - 1]);
   $('#nextDay').onclick = () => go(dates[dates.indexOf(state.date) + 1]);
+  $('#download').onclick = downloadReport;
   document.querySelectorAll('.tabs button').forEach((b) => (b.onclick = () => { state.tab = b.dataset.tab; render(); }));
   window.addEventListener('hashchange', () => {
     const n = readHash();
@@ -90,15 +92,17 @@ function render() {
   writeHash();
 
   const day = state.day;
-  $('#meta').innerHTML = `Captura del ${fmtDate(day.date)} · ${fmtTime(day.generatedAt)} (hora Lima)` +
-    (day.comparedWith ? ` · comparado con ${fmtDate(day.comparedWith)}` : ' · primer día: sin comparación');
-  renderKpis(day);
+  $('#meta').innerHTML = metaHtml(day);
+  $('#kpis').innerHTML = kpisHtml(day);
   const view = { resumen: renderSummary, tiendas: renderStores, cambios: renderChanges, historial: renderHistory }[state.tab];
   $('#view').innerHTML = view(day);
   bindView();
 }
 
-function renderKpis(day) {
+const metaHtml = (day) => `Captura del ${fmtDate(day.date)} · ${fmtTime(day.generatedAt)} (hora Lima)` +
+  (day.comparedWith ? ` · comparado con ${fmtDate(day.comparedWith)}` : ' · primer día: sin comparación');
+
+function kpisHtml(day) {
   const ok = day.sites.filter((s) => s.status === 'ok').length;
   const bad = day.sites.length - ok;
   const campaigns = new Set(day.sites.flatMap((s) => s.summary?.campaigns || []));
@@ -107,7 +111,7 @@ function renderKpis(day) {
   const maxD = Math.max(0, ...day.sites.map((s) => Math.max(s.summary?.maxDiscount || 0, s.summary?.maxProductDiscount || 0)));
   const coupons = day.sites.reduce((n, s) => n + (s.summary?.coupons?.length || 0), 0);
   const k = (v, l, cls = '') => `<div class="kpi ${cls}"><div class="v">${v}</div><div class="l">${l}</div></div>`;
-  $('#kpis').innerHTML = [
+  return [
     k(`${ok}/${day.sites.length}`, bad ? `tiendas capturadas · ${bad} con problema` : 'tiendas capturadas', bad ? 'bad' : ''),
     k(campaigns.size, campaigns.size ? [...campaigns].slice(0, 3).join(', ') : 'campañas detectadas'),
     k(maxD ? `${maxD}%` : '—', 'descuento máximo visto'),
@@ -125,7 +129,8 @@ const list = (sigs, max = 4) => {
 };
 const statusBadge = (s) => `<span class="badge ${s.status}">${STATUS_LABEL[s.status] || s.status}</span>`;
 
-function renderSummary(day) {
+// En el reporte descargado los links a tiendas apuntan a su tarjeta dentro del mismo archivo.
+function renderSummary(day, { report = false } = {}) {
   const rows = day.sites.map((s) => {
     const sm = s.summary || {};
     const disc = sm.maxDiscount ? `${sm.maxDiscount}%` : '—';
@@ -134,7 +139,7 @@ function renderSummary(day) {
       ? `<span class="delta-add">+${s.diff.added.length}</span> <span class="delta-del">−${s.diff.removed.length}</span>`
       : '<span class="dim">—</span>';
     return `<tr>
-      <td class="store"><a href="#${day.date}/tiendas" data-jump="${s.id}">${esc(s.name)}</a><div>${statusBadge(s)}</div></td>
+      <td class="store"><a href="${report ? `#site-${s.id}` : `#${day.date}/tiendas" data-jump="${s.id}`}">${esc(s.name)}</a><div>${statusBadge(s)}</div></td>
       <td>${list(byType(s, 'campaign'), 3)}</td>
       <td class="num">${disc}${prod}</td>
       <td>${list([...byType(s, 'card'), ...byType(s, 'bank')], 3)}</td>
@@ -170,42 +175,55 @@ function filtersBar() {
 }
 
 function renderStores(day) {
-  const cards = day.sites.map((s) => {
-    const sigs = (s.signals || []).filter((x) => x.type !== 'price' && siteMatches(x));
-    const groups = TYPE_ORDER.map((t) => {
-      const g = sigs.filter((x) => x.type === t);
-      return g.length ? `<div class="group"><div class="gl">${TYPE_LABEL[t]}</div><div class="gv">${g.map((x) => chip(x)).join('')}</div></div>` : '';
-    }).join('');
-    const removed = (s.diff?.removed || []).filter((x) => (!state.filter.type || x.type === state.filter.type));
-    const sm = s.summary || {};
-    const prices = sm.priceCount ? `<div class="group"><div class="gl">Precios</div><div class="gv dim">${sm.priceCount} precios en soles · S/ ${sm.minPrice} – S/ ${sm.maxPrice}${sm.productDiscountCount ? ` · ${sm.productDiscountCount} badges de dscto (máx. ${sm.maxProductDiscount}%)` : ''}</div></div>` : '';
-    const hero = s.screenshots?.hero
-      ? `<button class="thumb" data-shot="${esc(s.screenshots.full || s.screenshots.hero)}" data-title="${esc(s.name)}"><img loading="lazy" src="${esc(s.screenshots.hero)}" alt="Primera pantalla de ${esc(s.name)}"></button>`
-      : `<div class="thumb nothumb">Sin captura</div>`;
-    return `<article class="card" id="site-${s.id}">
-      ${hero}
-      <div class="card-body">
-        <div class="card-head">
-          <h3>${esc(s.name)} ${statusBadge(s)}</h3>
-          <div class="links">
-            ${s.screenshots?.full ? `<a href="#" data-shot="${esc(s.screenshots.full)}" data-title="${esc(s.name)} · página completa">página completa</a>` : ''}
-            <a href="${esc(s.url)}" target="_blank" rel="noopener">sitio ↗</a>
-          </div>
-        </div>
-        ${s.error ? `<div class="err">${esc(s.error)}</div>` : ''}
-        ${s.status === 'blocked' ? `<div class="err">El sitio bloqueó la visita automática (título: “${esc(s.title)}”).</div>` : ''}
-        ${groups || '<div class="dim">Sin señales con este filtro.</div>'}
-        ${removed.length && !state.filter.onlyNew ? `<div class="group"><div class="gl">Salieron</div><div class="gv">${removed.map(goneChip).join('')}</div></div>` : ''}
-        ${state.filter.type || state.filter.onlyNew ? '' : prices}
-        <details><summary>Texto leído (OCR del hero y banners)</summary>
-          <pre>${esc((s.extracted?.ocr || '').slice(0, 3000))}</pre>
-          <pre>${esc((s.extracted?.banners || []).slice(0, 40).join('\n'))}</pre>
-        </details>
-      </div>
-    </article>`;
-  });
-  return filtersBar() + `<div class="cards">${cards.join('')}</div>`;
+  return filtersBar() + `<div class="cards">${day.sites.map((s) => storeCard(s)).join('')}</div>`;
 }
+
+// En el reporte descargado no hay filtros, la imagen va incrustada (heroSrc) y la página completa se abre en línea.
+function storeCard(s, { report = false, heroSrc = s.screenshots?.hero } = {}) {
+  const f = report ? { q: '', type: '', onlyNew: false } : state.filter;
+  const sigs = (s.signals || []).filter((x) => x.type !== 'price' && (report || siteMatches(x)));
+  const groups = TYPE_ORDER.map((t) => {
+    const g = sigs.filter((x) => x.type === t);
+    return g.length ? `<div class="group"><div class="gl">${TYPE_LABEL[t]}</div><div class="gv">${g.map((x) => chip(x)).join('')}</div></div>` : '';
+  }).join('');
+  const removed = (s.diff?.removed || []).filter((x) => (!f.type || x.type === f.type));
+  const sm = s.summary || {};
+  const prices = sm.priceCount ? `<div class="group"><div class="gl">Precios</div><div class="gv dim">${sm.priceCount} precios en soles · S/ ${sm.minPrice} – S/ ${sm.maxPrice}${sm.productDiscountCount ? ` · ${sm.productDiscountCount} badges de dscto (máx. ${sm.maxProductDiscount}%)` : ''}</div></div>` : '';
+  const full = s.screenshots?.full;
+  const img = heroSrc ? `<img ${report ? '' : 'loading="lazy" '}src="${esc(heroSrc)}" alt="Primera pantalla de ${esc(s.name)}">` : '';
+  const hero = !img
+    ? `<div class="thumb nothumb">Sin captura</div>`
+    : report
+      ? `<a class="thumb" href="${esc(absUrl(full || s.screenshots.hero))}" target="_blank" rel="noopener">${img}</a>`
+      : `<button class="thumb" data-shot="${esc(full || s.screenshots.hero)}" data-title="${esc(s.name)}">${img}</button>`;
+  const fullLink = !full ? ''
+    : report
+      ? `<a href="${esc(absUrl(full))}" target="_blank" rel="noopener">página completa ↗</a>`
+      : `<a href="#" data-shot="${esc(full)}" data-title="${esc(s.name)} · página completa">página completa</a>`;
+  return `<article class="card" id="site-${s.id}">
+    ${hero}
+    <div class="card-body">
+      <div class="card-head">
+        <h3>${esc(s.name)} ${statusBadge(s)}</h3>
+        <div class="links">
+          ${fullLink}
+          <a href="${esc(s.url)}" target="_blank" rel="noopener">sitio ↗</a>
+        </div>
+      </div>
+      ${s.error ? `<div class="err">${esc(s.error)}</div>` : ''}
+      ${s.status === 'blocked' ? `<div class="err">El sitio bloqueó la visita automática (título: “${esc(s.title)}”).</div>` : ''}
+      ${groups || '<div class="dim">Sin señales con este filtro.</div>'}
+      ${removed.length && !f.onlyNew ? `<div class="group"><div class="gl">Salieron</div><div class="gv">${removed.map(goneChip).join('')}</div></div>` : ''}
+      ${f.type || f.onlyNew ? '' : prices}
+      <details><summary>Texto leído (OCR del hero y banners)</summary>
+        <pre>${esc((s.extracted?.ocr || '').slice(0, 3000))}</pre>
+        <pre>${esc((s.extracted?.banners || []).slice(0, 40).join('\n'))}</pre>
+      </details>
+    </div>
+  </article>`;
+}
+
+const absUrl = (p) => new URL(p, location.href).href;
 
 function renderChanges(day) {
   if (!day.comparedWith) return `<div class="panel empty">Es el primer día con datos: mañana aparecerán aquí las mecánicas nuevas y las que desaparecieron.</div>`;
@@ -272,6 +290,77 @@ function bindView() {
     fq.oninput = () => { state.filter.q = fq.value; rerenderKeepFocus(); };
     $('#ftype').onchange = (e) => { state.filter.type = e.target.value; render(); };
     $('#fnew').onchange = (e) => { state.filter.onlyNew = e.target.checked; render(); };
+  }
+}
+
+// Reporte descargable: un solo HTML con el resumen, los cambios y cada tienda, con los heros incrustados.
+const REPORT_CSS = `
+.top { position: static; }
+.top-row { padding-bottom: 14px; }
+h2 { font-size: 17px; margin: 28px 0 10px; }
+@media print { .top { border: 0; } .card, .feed .item, tr { break-inside: avoid; } details { display: none; } }`;
+
+async function toDataUrl(url) {
+  const blob = await (await fetch(url)).blob();
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(r.result);
+    r.onerror = reject;
+    r.readAsDataURL(blob);
+  });
+}
+
+export async function buildReportHtml(day = state.day) {
+  const css = await (await fetch('assets/style.css')).text();
+  const heroes = new Map(await Promise.all(day.sites.map(async (s) =>
+    [s.id, s.screenshots?.hero ? await toDataUrl(s.screenshots.hero).catch(() => null) : null])));
+  const online = absUrl(`#${day.date}/resumen`);
+  return `<!doctype html>
+<html lang="es-PE">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noimageindex">
+<title>Monitor de campañas · ${esc(day.date)}</title>
+<style>${css}${REPORT_CSS}</style>
+</head>
+<body>
+<header class="top"><div class="wrap top-row"><div>
+  <h1>Monitor de campañas · ${esc(fmtDate(day.date))}</h1>
+  <p class="sub">Homes de ecommerce peruanos · <a href="${esc(online)}">ver en línea</a></p>
+</div></div></header>
+<main class="wrap">
+  <p class="meta">${metaHtml(day)}</p>
+  <section class="kpis">${kpisHtml(day)}</section>
+  <h2>Resumen</h2>
+  ${renderSummary(day, { report: true })}
+  <h2>Cambios vs. día anterior</h2>
+  ${renderChanges(day)}
+  <h2>Tiendas</h2>
+  <div class="cards">${day.sites.map((s) => storeCard(s, { report: true, heroSrc: heroes.get(s.id) })).join('')}</div>
+</main>
+<footer class="wrap foot">Datos detectados automáticamente con reglas y OCR: pueden tener errores. Revisa siempre la captura.</footer>
+</body>
+</html>`;
+}
+
+async function downloadReport() {
+  const btn = $('#download');
+  const label = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Preparando…';
+  try {
+    const url = URL.createObjectURL(new Blob([await buildReportHtml()], { type: 'text/html' }));
+    const a = Object.assign(document.createElement('a'), { href: url, download: `monitor-campanas-${state.date}.html` });
+    document.body.append(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+  } catch (e) {
+    alert(`No se pudo armar el reporte: ${e.message}`);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = label;
   }
 }
 

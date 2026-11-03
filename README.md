@@ -66,6 +66,27 @@ Si el Mac está dormido a esa hora, macOS la corre al despertar; si está apagad
 no aparece. La tarea usa la ruta de `node` del momento de instalarla: si cambias de versión con nvm, vuelve a correr
 el instalador.
 
+## Reporte descargable
+
+El botón **Descargar** del dashboard baja el día que estás viendo en un solo archivo HTML
+(`monitor-campanas-AAAA-MM-DD.html`, unos 2 MB). Trae el resumen, los cambios y cada tienda con su captura incrustada,
+así que se puede mandar por WhatsApp o correo y abrir sin internet; la página completa de cada tienda se abre en línea.
+También se puede imprimir o guardar como PDF desde el navegador.
+
+## Google Sheets
+
+`apps-script/sheets-sync.gs` copia los datos publicados a una hoja de cálculo, sin hacer scraping:
+la pestaña **Tiendas por día** tiene una fila por tienda y día, y **Cambios**, una fila por cada mecánica que apareció o salió.
+
+1. Crea una hoja nueva en Google Sheets → **Extensiones → Apps Script**.
+2. Reemplaza todo el contenido de `Código.gs` por el de `apps-script/sheets-sync.gs` y guarda.
+3. Arriba, elige la función **instalar** y presiona **Ejecutar**. Google pide permiso para leer la web y editar
+   esa hoja (si sale “Google no verificó esta app”, es porque el script es tuyo: *Configuración avanzada → Ir a…*).
+
+Trae todo el historial y revisa cada hora si hay datos nuevos. Si un día se vuelve a publicar (el Mac sube Ripley y
+después GitHub las demás), sus filas se reemplazan, no se duplican. Esas dos pestañas se reescriben en cada
+sincronización: las fórmulas, tablas dinámicas o notas propias van en otra pestaña.
+
 ## Limitaciones a tener en cuenta
 
 - GitHub Actions corre desde servidores en EE. UU. Algunos sitios pueden bloquear la visita o mostrar otra versión;
