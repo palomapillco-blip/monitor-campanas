@@ -19,7 +19,7 @@
  * Las columnas son las mismas que las del Excel del dashboard (src/workbook.js): si cambias una, cambia la otra.
  */
 
-const BASE_URL = 'https://denv17.github.io/monitor-campanas/';
+const BASE_URL = 'https://palomapillco-blip.github.io/monitor-campanas/';
 // La primera vez puede haber muchos días: se traen de a poco (los más recientes primero) y el resto en la
 // siguiente revisión, para no pasar el límite de 6 minutos por ejecución.
 const MAX_DIAS_POR_CORRIDA = 30;
