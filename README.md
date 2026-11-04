@@ -41,18 +41,26 @@ Las palabras clave (tarjetas, bancos, campañas, categorías, urgencia) están a
 3. Cuando termine, ve a **Settings → Pages** → *Source: Deploy from a branch* → rama `gh-pages`, carpeta `/ (root)`.
 4. El dashboard queda en `https://<usuario>.github.io/<repo>/`. Ese link es el que compartes.
 
-El workflow corre todos los días a las 7:30 a. m. (Lima). GitHub a veces atrasa o se salta una corrida programada,
-así que tiene dos horarios de respaldo (9:15 y 11:10 a. m.) que solo capturan si ese día todavía no hay datos de GitHub;
-**Run workflow** siempre captura. Los datos y capturas se guardan en la rama `gh-pages`
-como un único commit, así el repo no crece con las imágenes; las capturas de más de `keepScreenshotsDays` días se borran,
-los JSON se conservan siempre. Para cambiar las horas edita los `cron` en `.github/workflows/monitor.yml` (están en UTC: Lima = UTC−5).
+La captura diaria la hace el Mac a las 7:00 a. m. (ver abajo): las corridas programadas de GitHub salen con horas
+de atraso, así que quedan de respaldo. Corren a las 7:30, 9:15 y 11:10 a. m. (Lima), o cuando GitHub las largue, y solo
+capturan las tiendas que ese día falten o no estén en OK; si no falta ninguna, no hacen nada. **Run workflow** siempre
+captura todas las de GitHub. Un cambio del dashboard (`index.html`, `assets/`) subido a `main` se publica solo, sin capturar.
 
-## Sitios que se capturan desde el Mac (Ripley, La Curacao, Efe, Platanitos)
+Los datos y capturas se guardan en la rama `gh-pages` como un único commit, así el repo no crece con las imágenes;
+las capturas de más de `keepScreenshotsDays` días se borran, los JSON se conservan siempre. Para cambiar las horas edita
+los `cron` en `.github/workflows/monitor.yml` (están en UTC: Lima = UTC−5).
+
+## Captura diaria desde el Mac
+
+Una tarea diaria en el Mac captura todas las tiendas y las publica en la rama `gh-pages`. Antes de capturar se
+actualiza desde `main` (`git pull --ff-only`), así que una tienda o palabra clave nueva entra en la corrida del día
+siguiente sin tocar el Mac. Si la carpeta del Mac tiene cambios sin subir que chocan con `main`, avisa en el log y
+sigue con lo que hay.
 
 Algunos sitios bloquean las visitas desde los servidores de GitHub (Ripley responde con la verificación de
-Cloudflare; La Curacao y Efe con 426 y Platanitos con 403). Esos sitios llevan `"runner": "local"` en `sites.json`: GitHub Actions los salta y los captura
-una tarea diaria en el Mac, que los publica en la misma rama `gh-pages` sin pisar lo que publicó GitHub
-(y viceversa: `src/publish.js` mezcla por tienda y reintenta si las dos corridas coinciden).
+Cloudflare; La Curacao y Efe con 426 y Platanitos con 403). Esos llevan `"runner": "local"` en `sites.json`: solo
+los captura el Mac, y las corridas de GitHub los saltan. `src/publish.js` mezcla por tienda, así que el Mac y GitHub
+no se pisan, y reintenta si las dos corridas coinciden.
 
 ```bash
 ./scripts/install-mac-schedule.sh          # instala la tarea diaria (7:00 a. m.; otra hora: 06:30)
@@ -62,8 +70,8 @@ tail -f .cache/local-run.log               # ver qué pasó
 npm run monitor:local                      # lo mismo, a mano
 ```
 
-Si el Mac está dormido a esa hora, macOS la corre al despertar; si está apagado todo el día, ese día esas tiendas
-no aparecen. La tarea usa la ruta de `node` del momento de instalarla: si cambias de versión con nvm, vuelve a correr
+Si el Mac está dormido a esa hora, macOS la corre al despertar; si está apagado todo el día, las corridas de respaldo
+de GitHub capturan las demás tiendas, pero las de `"runner": "local"` ese día no aparecen. La tarea usa la ruta de `node` del momento de instalarla: si cambias de versión con nvm, vuelve a correr
 el instalador.
 
 ## Descargas
@@ -86,8 +94,8 @@ la pestaña **Tiendas por día** tiene una fila por tienda y día, y **Cambios**
 3. Arriba, elige la función **instalar** y presiona **Ejecutar**. Google pide permiso para leer la web y editar
    esa hoja (si sale “Google no verificó esta app”, es porque el script es tuyo: *Configuración avanzada → Ir a…*).
 
-Trae todo el historial y revisa cada hora si hay datos nuevos. Si un día se vuelve a publicar (el Mac sube Ripley y
-después GitHub las demás), sus filas se reemplazan, no se duplican. Esas dos pestañas se reescriben en cada
+Trae todo el historial y revisa cada hora si hay datos nuevos. Si un día se vuelve a publicar (el Mac sube todo y
+después GitHub completa alguna tienda), sus filas se reemplazan, no se duplican. Esas dos pestañas se reescriben en cada
 sincronización: las fórmulas, tablas dinámicas o notas propias van en otra pestaña.
 
 ## Limitaciones a tener en cuenta

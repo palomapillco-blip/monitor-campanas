@@ -2,8 +2,9 @@ name: Monitor diario
 
 on:
   schedule:
-    # Horas en UTC (Lima = UTC−5). GitHub a veces atrasa o se salta una corrida programada,
-    # así que hay dos de respaldo: si la de las 7:30 ya capturó, las otras no hacen nada.
+    # De respaldo: el Mac captura todas las tiendas a las 7:00 (src/local-run.js). Estas corridas solo capturan
+    # las tiendas de GitHub que hoy falten o fallaron; si no falta ninguna, no hacen nada.
+    # Horas en UTC (Lima = UTC−5), y GitHub suele atrasarlas varias horas.
     - cron: '30 12 * * *'   # 7:30 a. m.
     - cron: '15 14 * * *'   # 9:15 a. m. (respaldo)
     - cron: '10 16 * * *'   # 11:10 a. m. (respaldo)
@@ -13,12 +14,17 @@ on:
         description: 'IDs de sitios separados por coma (vacío = todos)'
         required: false
         default: ''
+  # Un cambio del dashboard subido a main se publica al toque, sin capturar.
+  push:
+    branches: [main]
+    paths: ['index.html', 'assets/**', 'src/build-index.js', 'src/workbook.js', 'src/xlsx.js']
 
 permissions:
   contents: write
 
 concurrency:
-  group: monitor
+  # Grupo aparte para el dashboard: así no cancela una captura que esté esperando turno.
+  group: ${{ github.event_name == 'push' && 'dashboard' || 'monitor' }}
   cancel-in-progress: false
 
 jobs:
@@ -41,26 +47,38 @@ jobs:
             git archive FETCH_HEAD | tar -x -C site
           fi
           rm -f site/index.html && rm -rf site/assets
-          # Corrida de respaldo: si hoy ya se capturó alguna tienda de GitHub, no se vuelve a capturar.
+          # mode: capture (capturar y publicar), dashboard (solo publicar el dashboard) o skip (nada).
+          mode=capture
           today="site/data/$(date +%F).json"
-          if [ "${{ github.event_name }}" = schedule ] && [ -f "$today" ] && jq -e --slurpfile cfg sites.json '
-              ($cfg[0].sites | map(select((.runner // "github") == "github") | .id)) as $ids
-              | any(.sites[]; (.id | IN($ids[])) and .status != "error")' "$today" > /dev/null; then
-            echo "Hoy ya hay capturas de GitHub Actions: esta corrida de respaldo no hace nada."
-            echo "skip=true" >> "$GITHUB_OUTPUT"
+          if [ "${{ github.event_name }}" = push ]; then
+            mode=dashboard
+          elif [ "${{ github.event_name }}" = schedule ] && [ -f "$today" ]; then
+            # Corrida de respaldo: solo las tiendas de GitHub que hoy no están en OK.
+            pending=$(jq -r --slurpfile cfg sites.json '
+                [.sites[] | select(.status == "ok") | .id] as $ok
+                | [$cfg[0].sites[] | select(.enabled != false and (.runner // "github") == "github") | .id
+                   | select(IN($ok[]) | not)] | join(",")' "$today")
+            if [ -z "$pending" ]; then
+              echo "Hoy ya están todas las tiendas: esta corrida de respaldo no hace nada."
+              mode=skip
+            else
+              echo "Faltan: $pending"
+              echo "only=$pending" >> "$GITHUB_OUTPUT"
+            fi
           fi
+          echo "mode=$mode" >> "$GITHUB_OUTPUT"
 
       - uses: actions/setup-node@v4
-        if: steps.published.outputs.skip != 'true'
+        if: steps.published.outputs.mode != 'skip'
         with:
           node-version: 22
           cache: npm
 
-      - if: steps.published.outputs.skip != 'true'
+      - if: steps.published.outputs.mode == 'capture'
         run: npm ci
 
       - name: Cache de Playwright y del idioma de OCR
-        if: steps.published.outputs.skip != 'true'
+        if: steps.published.outputs.mode == 'capture'
         uses: actions/cache@v4
         with:
           path: |
@@ -68,24 +86,31 @@ jobs:
             .cache/tesseract
           key: deps-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
-      - if: steps.published.outputs.skip != 'true'
+      - if: steps.published.outputs.mode == 'capture'
         run: npx playwright install --with-deps chromium
 
       - name: Capturar homes
-        if: steps.published.outputs.skip != 'true'
+        if: steps.published.outputs.mode == 'capture'
         env:
-          # Los sitios con "runner": "local" (p. ej. Ripley) los captura el Mac: ver src/local-run.js.
+          # Los sitios con "runner": "local" (p. ej. Ripley) solo los captura el Mac: ver src/local-run.js.
           MONITOR_RUNNER: github
+          ONLY: ${{ github.event.inputs.only || steps.published.outputs.only }}
         run: |
-          if [ -n "${{ github.event.inputs.only }}" ]; then
-            node --no-deprecation src/monitor.js --only "${{ github.event.inputs.only }}"
+          if [ -n "$ONLY" ]; then
+            node --no-deprecation src/monitor.js --only "$ONLY"
           else
             node --no-deprecation src/monitor.js
           fi
 
       # Mezcla con lo ya publicado (sin pisar lo que publicó el Mac) y sube un único commit sin historial.
       - name: Publicar en gh-pages
-        if: steps.published.outputs.skip != 'true'
+        if: steps.published.outputs.mode != 'skip'
         env:
           PUBLISH_REMOTE: https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-        run: node src/publish.js --from site
+          MODE: ${{ steps.published.outputs.mode }}
+        run: |
+          if [ "$MODE" = dashboard ]; then
+            node src/publish.js --dashboard
+          else
+            node src/publish.js --from site
+          fi

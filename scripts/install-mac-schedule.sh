@@ -1,5 +1,5 @@
 #!/bin/bash
-# Instala (o actualiza) la tarea diaria del Mac que captura los sitios con "runner": "local".
+# Instala (o actualiza) la tarea diaria del Mac que captura todas las tiendas (src/local-run.js).
 #   ./scripts/install-mac-schedule.sh [HH:MM]     (por defecto 07:00, hora del Mac)
 #   ./scripts/install-mac-schedule.sh --uninstall
 # Si el Mac está dormido a esa hora, macOS la corre al despertar.

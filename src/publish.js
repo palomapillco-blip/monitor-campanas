@@ -1,7 +1,8 @@
 // Publica en la rama gh-pages lo que capturó la última corrida, sin pisar lo que publicaron otras
-// (GitHub Actions publica casi todo; el Mac publica los sitios con "runner": "local").
+// (el Mac publica todas las tiendas cada mañana; GitHub Actions, las que falten).
 //
 //   node src/publish.js --from <carpeta OUT_DIR de la corrida> [--keep-dashboard]
+//   node src/publish.js --dashboard        (solo el dashboard, index.json y el Excel, sin capturas)
 //
 // Cada intento trae la versión publicada más reciente, reemplaza solo los sitios de esta corrida en el
 // JSON del día y empuja un único commit con --force-with-lease: si alguien publicó en el medio, reintenta.
@@ -9,7 +10,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import os from 'node:os';
 import { execFileSync, execSync } from 'node:child_process';
-import { ROOT, loadConfig } from './util.js';
+import { ROOT, limaDate, loadConfig } from './util.js';
 import { buildIndex } from './build-index.js';
 import { pruneScreenshots } from './prune.js';
 
@@ -18,6 +19,8 @@ const argValue = (name) => (args.includes(name) ? args[args.indexOf(name) + 1] :
 const from = path.resolve(argValue('--from') || ROOT);
 // El Mac no actualiza el dashboard (index.html/assets): eso lo hace GitHub Actions desde main.
 const keepDashboard = args.includes('--keep-dashboard');
+// GitHub Actions lo usa cuando se sube a main un cambio del dashboard: si no, recién se vería con su próxima captura.
+const dashboardOnly = args.includes('--dashboard');
 
 const git = (cwd, ...a) => execFileSync('git', a, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
 const gitConfig = (key) => {
@@ -31,7 +34,7 @@ const author = {
   email: gitConfig('user.email') || '41898282+github-actions[bot]@users.noreply.github.com',
 };
 
-async function mergeInto(dir, run, srcDay) {
+async function mergeDay(dir, run, srcDay) {
   const { sites: config } = await loadConfig();
   const order = config.map((s) => s.id);
   const dayFile = path.join(dir, 'data', `${run.date}.json`);
@@ -54,7 +57,10 @@ async function mergeInto(dir, run, srcDay) {
       if (await exists(src)) await fs.copyFile(src, path.join(shotsDir, f));
     }
   }
+}
 
+async function mergeInto(dir, run, srcDay) {
+  if (srcDay) await mergeDay(dir, run, srcDay);
   if (!keepDashboard || !(await exists(path.join(dir, 'index.html')))) {
     await fs.copyFile(path.join(ROOT, 'index.html'), path.join(dir, 'index.html'));
     await fs.cp(path.join(ROOT, 'assets'), path.join(dir, 'assets'), { recursive: true });
@@ -78,7 +84,8 @@ async function attempt(run, srcDay) {
     }
     await mergeInto(dir, run, srcDay);
     git(dir, 'add', '-A');
-    git(dir, '-c', `user.name=${author.name}`, '-c', `user.email=${author.email}`, 'commit', '-q', '-m', `Monitor ${run.date} · ${run.sites.join(', ')}`);
+    const message = srcDay ? `Monitor ${run.date} · ${run.sites.join(', ')}` : 'Actualizar dashboard';
+    git(dir, '-c', `user.name=${author.name}`, '-c', `user.email=${author.email}`, 'commit', '-q', '-m', message);
     // Un solo commit sin historial (las imágenes no se acumulan), pero solo si nadie publicó desde que lo trajimos.
     git(dir, 'push', '-q', `--force-with-lease=refs/heads/gh-pages:${head}`, remote, 'HEAD:refs/heads/gh-pages');
     return true;
@@ -90,16 +97,18 @@ async function attempt(run, srcDay) {
   }
 }
 
-const run = JSON.parse(await fs.readFile(path.join(from, '.last-run.json'), 'utf8').catch(() => 'null'));
-if (!run?.sites?.length) {
+const run = dashboardOnly
+  ? { date: limaDate(), sites: [] }
+  : JSON.parse(await fs.readFile(path.join(from, '.last-run.json'), 'utf8').catch(() => 'null'));
+if (!dashboardOnly && !run?.sites?.length) {
   console.log('Nada que publicar: la última corrida no capturó sitios.');
   process.exit(0);
 }
-const srcDay = JSON.parse(await fs.readFile(path.join(from, 'data', `${run.date}.json`), 'utf8'));
+const srcDay = dashboardOnly ? null : JSON.parse(await fs.readFile(path.join(from, 'data', `${run.date}.json`), 'utf8'));
 
 for (let i = 1; i <= 5; i++) {
   if (await attempt(run, srcDay)) {
-    console.log(`Publicado en gh-pages: ${run.date} · ${run.sites.join(', ')}`);
+    console.log(`Publicado en gh-pages: ${srcDay ? `${run.date} · ${run.sites.join(', ')}` : 'dashboard'}`);
     process.exit(0);
   }
   if (i < 5) {
