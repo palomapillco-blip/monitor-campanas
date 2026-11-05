@@ -8,13 +8,21 @@
 // La tarea programada del Mac (scripts/install-mac-schedule.sh) ejecuta exactamente esto.
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { execSync, spawnSync } from 'node:child_process';
+import { execSync, spawn, spawnSync } from 'node:child_process';
 import { ROOT } from './util.js';
 
 const STAGE = path.join(ROOT, '.cache', 'local-site');
 const stamp = () => new Date().toLocaleString('es-PE', { timeZone: 'America/Lima' });
 
 console.log(`\n=== Corrida local · ${stamp()} ===`);
+
+// Con la tapa cerrada el Mac solo despierta unos 45 segundos cada 15 minutos y la corrida tarda más de una hora.
+// -s lo mantiene despierto (solo si está enchufado; -i no alcanza con la tapa cerrada) y -w lo suelta al terminar.
+if (process.platform === 'darwin') {
+  spawn('caffeinate', ['-s', '-w', String(process.pid)], { stdio: 'ignore' })
+    .on('error', () => console.warn('No se pudo lanzar caffeinate: el Mac podría dormirse durante la corrida.'))
+    .unref();
+}
 
 // Lo que se haya subido a main (tiendas nuevas, palabras clave) entra en la corrida de hoy.
 try {

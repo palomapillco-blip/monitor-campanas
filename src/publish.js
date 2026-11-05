@@ -41,16 +41,18 @@ async function mergeDay(dir, run, srcDay) {
   await fs.mkdir(path.dirname(dayFile), { recursive: true });
   const published = JSON.parse(await fs.readFile(dayFile, 'utf8').catch(() => 'null'));
 
-  const sites = [
-    ...(published?.sites || []).filter((s) => order.includes(s.id) && !run.sites.includes(s.id)),
-    ...srcDay.sites.filter((s) => run.sites.includes(s.id)),
-  ].sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
+  // Una captura con problemas no reemplaza a una buena: el Mac y GitHub pueden capturar la misma tienda el mismo día.
+  const fresh = srcDay.sites.filter((s) => run.sites.includes(s.id));
+  const worse = (s) => s.status === 'ok' && fresh.some((f) => f.id === s.id && f.status !== 'ok');
+  const kept = (published?.sites || []).filter((s) => order.includes(s.id) && (!run.sites.includes(s.id) || worse(s)));
+  const updated = fresh.filter((f) => !kept.some((s) => s.id === f.id));
+  const sites = [...kept, ...updated].sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
   const day = { ...(published || srcDay), generatedAt: new Date().toISOString(), comparedWith: srcDay.comparedWith ?? published?.comparedWith ?? null, sites };
   await fs.writeFile(dayFile, JSON.stringify(day, null, 1));
 
   const shotsDir = path.join(dir, 'screenshots', run.date);
   await fs.mkdir(shotsDir, { recursive: true });
-  for (const id of run.sites) {
+  for (const { id } of updated) {
     for (const kind of ['hero', 'full']) {
       const f = `${id}-${kind}.jpg`;
       const src = path.join(from, 'screenshots', run.date, f);

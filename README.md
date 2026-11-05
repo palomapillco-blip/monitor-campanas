@@ -60,7 +60,7 @@ sigue con lo que hay.
 Algunos sitios bloquean las visitas desde los servidores de GitHub (Ripley responde con la verificación de
 Cloudflare; La Curacao y Efe con 426 y Platanitos con 403). Esos llevan `"runner": "local"` en `sites.json`: solo
 los captura el Mac, y las corridas de GitHub los saltan. `src/publish.js` mezcla por tienda, así que el Mac y GitHub
-no se pisan, y reintenta si las dos corridas coinciden.
+no se pisan: una captura con problemas no reemplaza a una buena del mismo día, y reintenta si las dos corridas coinciden.
 
 ```bash
 ./scripts/install-mac-schedule.sh          # instala la tarea diaria (7:00 a. m.; otra hora: 06:30)
@@ -70,7 +70,9 @@ tail -f .cache/local-run.log               # ver qué pasó
 npm run monitor:local                      # lo mismo, a mano
 ```
 
-Si el Mac está dormido a esa hora, macOS la corre al despertar; si está apagado todo el día, las corridas de respaldo
+Si el Mac está dormido a esa hora, también con la tapa cerrada, la tarea arranca en su siguiente despertar (hasta unos
+15 minutos después) y `caffeinate -s` lo mantiene despierto hasta que termina. Eso solo funciona **enchufado**: a batería
+y con la tapa cerrada, la corrida puede tardar más de una hora. Si está apagado todo el día, las corridas de respaldo
 de GitHub capturan las demás tiendas, pero las de `"runner": "local"` ese día no aparecen. La tarea usa la ruta de `node` del momento de instalarla: si cambias de versión con nvm, vuelve a correr
 el instalador.
 
