@@ -17,7 +17,7 @@ on:
   # Un cambio del dashboard subido a main se publica al toque, sin capturar.
   push:
     branches: [main]
-    paths: ['index.html', 'assets/**', 'src/build-index.js', 'src/workbook.js', 'src/xlsx.js']
+    paths: ['index.html', 'anuncios.html', 'assets/**', 'src/build-index.js', 'src/workbook.js', 'src/xlsx.js']
 
 permissions:
   contents: write

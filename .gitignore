@@ -8,3 +8,6 @@ _site/
 /data/
 /screenshots/
 /site/
+/anuncios/
+.last-run.json
+.last-anuncios.json

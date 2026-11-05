@@ -1,0 +1,75 @@
+name: Anuncios diario
+
+on:
+  schedule:
+    # Respaldo del Mac (src/local-run.js corre los anuncios a las 7:00). Google casi siempre funciona desde aquí;
+    # Meta suele bloquear a los servidores de GitHub, y en ese caso se conserva lo que publicó el Mac.
+    # Horas en UTC (Lima = UTC−5).
+    - cron: '45 13 * * *'   # 8:45 a. m.
+  workflow_dispatch:
+    inputs:
+      only:
+        description: 'IDs de marcas separados por coma (vacío = todas)'
+        required: false
+        default: ''
+      source:
+        description: 'Fuente: meta, google o vacío para ambas'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+concurrency:
+  group: anuncios
+  cancel-in-progress: false
+
+jobs:
+  anuncios:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      OUT_DIR: site
+      TZ: America/Lima
+    steps:
+      - uses: actions/checkout@v4
+
+      # Lo publicado: el día anterior (para marcar lo nuevo) y las miniaturas que ya existen.
+      - name: Traer historial publicado
+        run: |
+          mkdir -p site
+          if git fetch --depth=1 origin gh-pages; then
+            git archive FETCH_HEAD anuncios 2>/dev/null | tar -x -C site || true
+          fi
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Cache de Playwright y del idioma de OCR
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/ms-playwright
+            .cache/tesseract
+          key: deps-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - run: npx playwright install --with-deps chromium
+
+      - name: Capturar anuncios
+        env:
+          ONLY: ${{ github.event.inputs.only }}
+          SOURCE: ${{ github.event.inputs.source }}
+        run: |
+          set --
+          [ -n "$ONLY" ] && set -- "$@" --only "$ONLY"
+          [ -n "$SOURCE" ] && set -- "$@" --source "$SOURCE"
+          node --no-deprecation src/anuncios.js "$@"
+
+      - name: Publicar en gh-pages
+        env:
+          PUBLISH_REMOTE: https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+        run: node src/anuncios-publish.js --from site

@@ -46,7 +46,14 @@ try {
 const node = (script, extra = [], env = {}) =>
   spawnSync(process.execPath, ['--no-deprecation', script, ...extra], { cwd: ROOT, stdio: 'inherit', env: { ...process.env, ...env } }).status;
 
-if (node('src/monitor.js', [], { OUT_DIR: STAGE, MONITOR_RUNNER: '' }) !== 0) process.exit(1);
-const status = node('src/publish.js', ['--from', STAGE, '--keep-dashboard']);
-console.log(`=== Fin · ${stamp()} · ${status === 0 ? 'OK' : 'con errores'} ===`);
-process.exit(status ?? 1);
+const homes = node('src/monitor.js', [], { OUT_DIR: STAGE, MONITOR_RUNNER: '' }) === 0
+  ? node('src/publish.js', ['--from', STAGE, '--keep-dashboard'])
+  : 1;
+
+// Anuncios de Meta y Google (anuncios.json). Meta suele bloquear a los servidores de GitHub: el Mac es la fuente principal.
+const ads = node('src/anuncios.js', [], { OUT_DIR: STAGE }) === 0
+  ? node('src/anuncios-publish.js', ['--from', STAGE, '--keep-dashboard'])
+  : 1;
+
+console.log(`=== Fin · ${stamp()} · homes ${homes === 0 ? 'OK' : 'con errores'} · anuncios ${ads === 0 ? 'OK' : 'con errores'} ===`);
+process.exit(homes || ads ? 1 : 0);

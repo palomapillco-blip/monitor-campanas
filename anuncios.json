@@ -1,0 +1,20 @@
+{
+  "settings": {
+    "campaign": "Cyber Wow 2026",
+    "keyword": "cyber",
+    "startDate": "2026-10-28",
+    "endDate": "2026-11-05",
+    "country": "PE",
+    "googleRegion": 2604,
+    "thumbWidth": 320,
+    "maxScrolls": 60
+  },
+  "brands": [
+    { "id": "ripley", "name": "Ripley", "group": "Ripley", "metaPageId": "364617108960", "googleDomain": "ripley.com.pe" },
+    { "id": "falabella", "name": "Falabella", "group": "Grupo Falabella", "metaPageId": "130287678273", "googleDomain": "falabella.com.pe" },
+    { "id": "sodimac", "name": "Sodimac", "group": "Grupo Falabella", "metaPageId": "196234580400662", "googleDomain": "sodimac.com.pe" },
+    { "id": "tottus", "name": "Tottus", "group": "Grupo Falabella", "metaPageId": "175067819212798", "googleDomain": "tottus.com.pe" },
+    { "id": "wong", "name": "Wong", "group": "Cencosud", "metaPageId": "173568266025629", "googleDomain": "wong.pe" },
+    { "id": "metro", "name": "Metro", "group": "Cencosud", "metaPageId": "119707938207", "googleDomain": "metro.pe" }
+  ]
+}

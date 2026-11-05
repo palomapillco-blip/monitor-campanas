@@ -76,6 +76,44 @@ y con la tapa cerrada, la corrida puede tardar más de una hora. Si está apagad
 de GitHub capturan las demás tiendas, pero las de `"runner": "local"` ese día no aparecen. La tarea usa la ruta de `node` del momento de instalarla: si cambias de versión con nvm, vuelve a correr
 el instalador.
 
+## Monitor de anuncios (Meta y Google)
+
+`anuncios.html` (enlazado desde el dashboard) muestra los anuncios de la competencia de una campaña en
+**Meta Ad Library** y **Google Ads Transparency Center**, en tres pestañas: Meta, Google y Meta vs Google. Marca como
+**Nuevo** lo que no estaba el día anterior. Se configura en `anuncios.json`:
+
+- `settings`:
+  - `campaign`: nombre de la campaña.
+  - `keyword`: palabra clave, por ejemplo `cyber`.
+  - `startDate` / `endDate`: la ventana de la campaña.
+- `brands`: cada marca con su `metaPageId` (el número `view_all_page_id` de la URL del anunciante en el Ad Library)
+  y su `googleDomain` (por ejemplo `ripley.com.pe`).
+
+`src/anuncios.js` hace dos cosas:
+
+- **Meta:** abre el Ad Library de cada marca con Playwright, recorre la lista ("Ver más") y se queda con los anuncios
+  activos cuyo texto contiene la palabra clave.
+- **Google:** consulta el centro de transparencia sin navegador y toma los anuncios mostrados por primera vez desde
+  `startDate`. De los nuevos lee el titular y la descripción. A los banners sin texto les pasa OCR: si encuentra la
+  palabra clave quedan **Sí**, si no, **Por revisar**.
+
+Guarda miniaturas propias en `anuncios/img/` (los links de imagen de Meta caducan en días) y el día en
+`anuncios/data/AAAA-MM-DD.json`.
+
+```bash
+npm run anuncios                              # todas las marcas, Meta y Google
+npm run anuncios -- --only ripley,wong        # solo algunas marcas
+npm run anuncios -- --source google           # solo una fuente
+npm run anuncios:publish -- --from .          # publicar una corrida local en gh-pages
+```
+
+- **Corrida diaria:** la del Mac (`npm run monitor:local`) también captura y publica los anuncios. El workflow
+  **Anuncios diario** es el respaldo, a las 8:45 a. m. Meta suele bloquear a los servidores de GitHub; cuando eso pasa,
+  `src/anuncios-publish.js` conserva lo que publicó el Mac (mezcla por marca y fuente, igual que `publish.js`).
+- **Corregir la clasificación de Google:** agrega `"<link del anuncio>": "Sí"` o `"No"` en `anuncios-revision.json`.
+  Se aplica en la siguiente corrida.
+- **Límite:** las bibliotecas no publican inversión ni impresiones de anuncios comerciales en Perú.
+
 ## Descargas
 
 El botón **Descargar** del dashboard ofrece dos archivos:

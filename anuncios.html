@@ -1,0 +1,665 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noimageindex">
+<title>Monitor de anuncios · Meta y Google</title>
+<style>
+/* Layout: encabezado + indicadores, luego secciones en tarjetas; una columna en móvil */
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --fg: #1b1f24; --muted: #5d6673; --line: #dfe3e8;
+  --grid: #e9ecf0; --bar-muted: #b8c0cb; --shadow: 0 8px 28px rgba(20, 30, 45, .16);
+  --c1: #2f6fdb; --c2: #1f9d74; --c3: #d9822b; --c4: #c2416b; --c5: #7a5bd1; --c6: #3b9fb8;
+  --serif: Georgia, "Times New Roman", serif;
+  --sans: "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #12151a; --panel: #1a1f26; --fg: #e8ebef; --muted: #9aa4b1; --line: #2c333d;
+    --grid: #252c35; --bar-muted: #4a5462; --shadow: 0 8px 28px rgba(0, 0, 0, .5);
+    --c1: #6b9cf0; --c2: #4cc49b; --c3: #eda05a; --c4: #e46f95; --c5: #a48cf0; --c6: #66c1d6;
+    color-scheme: dark;
+  }
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--sans); font-size: 14px; line-height: 1.45; }
+.wrap { max-width: 1240px; margin: 0 auto; padding: 28px max(16px, env(safe-area-inset-right, 0px)) 48px max(16px, env(safe-area-inset-left, 0px)); display: grid; gap: 28px; }
+h1 { font-family: var(--serif); font-weight: 400; font-size: clamp(1.6rem, 3vw, 2.2rem); margin: 0; text-wrap: balance; }
+h2 { margin: 0; font-size: 1.1rem; font-weight: 600; }
+h3 { margin: 0; font-size: 1rem; font-weight: 600; }
+.lead { margin: 0; font-size: 1rem; max-width: 72ch; }
+.meta, .note { margin: 0; color: var(--muted); font-size: 12.5px; }
+.head { display: grid; gap: 8px; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr)); gap: 12px; }
+.tile, .card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; }
+.tile { padding: 14px 18px; display: grid; gap: 4px; align-content: start; }
+.tile-l, .tile-n { color: var(--muted); font-size: 12.5px; }
+.num { font-family: var(--serif); font-size: 2rem; font-variant-numeric: tabular-nums; }
+.section { display: grid; gap: 12px; }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr)); gap: 12px; }
+.card { padding: 18px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.chart { position: relative; min-height: 220px; }
+.chart svg { display: block; width: 100%; height: auto; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12.5px; color: var(--muted); }
+.sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: baseline; }
+.tip { position: absolute; pointer-events: none; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; box-shadow: var(--shadow); padding: 6px 10px; font-size: 12.5px; white-space: nowrap; z-index: 2; }
+.tip .th { color: var(--muted); margin-bottom: 2px; }
+.tablewrap { overflow: auto; min-width: 0; }
+table { width: 100%; border-collapse: collapse; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+th { text-align: left; font-weight: 600; color: var(--muted); padding: 6px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; position: sticky; top: 0; background: var(--panel); z-index: 1; }
+td { padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.r { text-align: right; }
+.bar { display: flex; align-items: center; gap: 6px; justify-content: flex-end; }
+.bar i { display: block; height: 6px; border-radius: 2px; background: var(--bar-muted); }
+.brand { display: inline-flex; align-items: center; white-space: nowrap; }
+.ads { max-height: 640px; }
+td.txt { min-width: 260px; max-width: 540px; }
+.clamp { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.pill { display: inline-block; padding: 0 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); white-space: nowrap; }
+.controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font: inherit; font-size: 12.5px; padding: 4px 12px; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--fg); cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.search { font: inherit; font-size: 12.5px; padding: 6px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); flex: 1 1 200px; max-width: 360px; min-width: 0; }
+.chip:focus-visible, .search:focus-visible, .thumb:focus-visible, .close:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+a { color: inherit; }
+.thumb { display: block; padding: 0; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); cursor: zoom-in; overflow: hidden; width: 72px; }
+.thumb img { display: block; width: 72px; height: auto; max-height: 96px; object-fit: cover; }
+.visor { position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; padding: 16px; background: color-mix(in srgb, var(--bg) 72%, transparent); }
+.visor-card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; box-shadow: var(--shadow); padding: 18px; display: grid; grid-template-columns: minmax(0, 320px) minmax(0, 420px); gap: 18px; max-width: 100%; max-height: 100%; overflow: auto; }
+.visor-card img { width: 100%; height: auto; border-radius: 6px; display: block; }
+.visor-info { display: grid; gap: 8px; align-content: start; }
+.tabs { display: flex; flex-wrap: wrap; gap: 4px; border-bottom: 1px solid var(--line); margin-top: 6px; }
+.tab { font: inherit; font-size: 14px; font-weight: 600; padding: 8px 16px; border: 0; border-bottom: 2px solid transparent; background: transparent; color: var(--muted); cursor: pointer; margin-bottom: -1px; }
+.tab[aria-selected="true"] { color: var(--fg); border-bottom-color: var(--fg); }
+.tab:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+.panel { display: grid; gap: 28px; }
+.sw-nd { background: transparent; border: 1px dashed var(--muted); }
+.top-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.crumbs { margin: 0 0 4px; font-size: 13px; color: var(--muted); }
+.crumbs a { color: var(--c1); text-decoration: none; }
+.crumbs a:hover { text-decoration: underline; }
+.daynav { display: flex; gap: 6px; align-items: center; }
+.daynav button, .daynav select { background: var(--panel); color: var(--fg); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; font: inherit; cursor: pointer; }
+.daynav button:disabled { opacity: .4; cursor: default; }
+.pill-nuevo { margin-left: 6px; border-color: var(--c2); background: color-mix(in srgb, var(--c2) 14%, transparent); color: var(--c2); font-size: 11px; }
+.pill-si { border-color: var(--c2); color: var(--c2); }
+.pill-nd { border-style: dashed; }
+.close { justify-self: start; font: inherit; font-size: 12.5px; padding: 4px 14px; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--fg); cursor: pointer; }
+footer { color: var(--muted); font-size: 12px; }
+@media (max-width: 640px) { .visor-card { grid-template-columns: minmax(0, 1fr); } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="head">
+    <div class="top-row">
+      <div>
+        <p class="crumbs"><a href="./">Monitor de campañas</a> · <strong>Anuncios</strong></p>
+        <h1><span id="campania">Monitor de anuncios</span>: anuncios de la competencia</h1>
+      </div>
+      <nav class="daynav" aria-label="Día">
+        <button type="button" id="prevDay" aria-label="Día anterior">‹</button>
+        <select id="daySelect" aria-label="Elegir día"></select>
+        <button type="button" id="nextDay" aria-label="Día siguiente">›</button>
+      </nav>
+    </div>
+    <p class="meta" id="estado">Cargando anuncios…</p>
+    <nav class="tabs" role="tablist" aria-label="Canal">
+      <button type="button" class="tab" role="tab" data-tab="meta" aria-selected="true">Meta</button>
+      <button type="button" class="tab" role="tab" data-tab="google" aria-selected="false">Google</button>
+      <button type="button" class="tab" role="tab" data-tab="comparar" aria-selected="false">Meta vs Google</button>
+    </nav>
+  </header>
+
+  <div class="panel" data-panel="meta" role="tabpanel">
+  <div class="head">
+    <p class="lead"><b id="lider">—</b> es la marca con más anuncios Cyber activos en Meta (<b id="lider-n">—</b>), y Grupo Falabella (Falabella, Tottus y Sodimac) concentra <b id="pct-gf">—</b> de todos los anuncios.</p>
+    <p class="meta">Meta Ad Library · Perú · anuncios de las páginas oficiales que mencionan "<span class="clave">cyber</span>" en el texto · captura automática diaria</p>
+  </div>
+
+  <div class="tiles">
+    <div class="tile"><span class="tile-l">Anuncios Cyber activos</span><span class="num" id="k-total">—</span><span class="tile-n">6 marcas monitoreadas</span></div>
+    <div class="tile"><span class="tile-l">Lanzados en la campaña</span><span class="num" id="k-nov">—</span><span class="tile-n">Share del total</span></div>
+    <div class="tile"><span class="tile-l">En formato video</span><span class="num" id="k-video">—</span><span class="tile-n">El resto es imagen o carrusel</span></div>
+    <div class="tile"><span class="tile-l">Mencionan la App</span><span class="num" id="k-app">—</span><span class="tile-n">Texto o titular del anuncio</span></div>
+    <div class="tile"><span class="tile-l">Mayor descuento anunciado</span><span class="num" id="k-dscto">—</span><span class="tile-n">Máximo "% dscto" en el texto</span></div>
+  </div>
+
+  <section class="section">
+    <h2>Volumen y timing</h2>
+    <div class="grid2">
+      <div class="card">
+        <h3>Anuncios activos por marca</h3>
+        <p class="note">Cada barra es una marca; el número es su total de anuncios Cyber activos.</p>
+        <div class="chart" id="bars-marca"></div>
+      </div>
+      <div class="card">
+        <h3>Anuncios lanzados por día</h3>
+        <p class="note">Fecha de inicio del anuncio, del <span class="f-ini">—</span> al <span class="f-fin">—</span>. No se muestran los anuncios que empezaron antes (<span id="antes">—</span>).</p>
+        <div class="legend" id="legend"></div>
+        <div class="chart" id="bars-dia"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Qué comunica cada marca</h2>
+    <div class="card">
+      <h3>Mix de mensajes y formato</h3>
+      <p class="note">Share de los anuncios de cada marca que mencionan cada tema en el texto o titular. "Con % dscto" cuenta los textos que traen un porcentaje.</p>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Marca</th><th>Grupo</th><th class="r">Anuncios</th><th class="r">Video</th><th class="r">App</th><th class="r">Con % dscto</th><th class="r">Cuotas / tarjeta</th><th class="r">Tope dscto</th><th class="r">Primer anuncio</th></tr></thead>
+          <tbody id="tabla-marca"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Todos los anuncios</h2>
+    <div class="card">
+      <div class="controls">
+        <div class="chips" id="chips" role="group" aria-label="Filtrar por marca"></div>
+        <input class="search" id="search" type="search" placeholder="Buscar en el texto (ej. 70%, cuotas, App)" aria-label="Buscar en el texto del anuncio">
+      </div>
+      <p class="note">Mostrando <span id="conteo">—</span> anuncios, del más reciente al más antiguo. Haz clic en la imagen para verla en grande, o en el texto para abrir el anuncio en Meta Ad Library. En los videos se muestra la portada.</p>
+      <div class="tablewrap ads">
+        <table>
+          <thead><tr><th>Creatividad</th><th>Marca</th><th>Inicio</th><th>Formato</th><th>Texto</th><th>Botón</th><th class="r">% dscto</th></tr></thead>
+          <tbody id="tabla-anuncios"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  </div>
+
+  <div class="panel" data-panel="google" role="tabpanel" hidden>
+  <div class="head">
+    <p class="lead"><b id="g-lider">—</b> es la marca más activa en Google, con <b id="g-lider-n">—</b> anuncios nuevos desde el 28 oct, de los cuales <b id="g-lider-cyber">—</b> son Cyber confirmados.</p>
+    <p class="meta">Google Ads Transparency Center · Perú · anuncios mostrados por primera vez entre el <span class="f-ini">—</span> y el <span class="f-fin">—</span> que llevan al sitio de cada marca · se actualiza solo cada día</p>
+  </div>
+  <section class="section">
+    <div class="tiles">
+      <div class="tile"><span class="tile-l">Anuncios nuevos en Google</span><span class="num" id="g-total">—</span><span class="tile-n">Desde el 28 oct, 6 marcas</span></div>
+      <div class="tile"><span class="tile-l">Cyber confirmados</span><span class="num" id="g-cyber">—</span><span class="tile-n">Por texto o por la imagen</span></div>
+      <div class="tile"><span class="tile-l">Cyber entre los revisados</span><span class="num" id="g-pct">—</span><span class="tile-n">Excluye los "Sin dato"</span></div>
+      <div class="tile"><span class="tile-l">Sin dato o por revisar</span><span class="num" id="g-sindato">—</span><span class="tile-n">Se corrigen en anuncios-revision.json</span></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Volumen y clasificación</h2>
+    <div class="grid2">
+      <div class="card">
+        <h3>Anuncios nuevos por marca</h3>
+        <p class="note">Cada barra se divide en Cyber confirmado, no Cyber y sin dato o por revisar. "Por revisar" son banners sin texto en los que el OCR no encontró la palabra clave: revisa la imagen y corrígelos en anuncios-revision.json.</p>
+        <div class="legend"><span><i class="sw" style="background: var(--c2)"></i>Cyber</span><span><i class="sw" style="background: var(--bar-muted)"></i>No Cyber</span><span><i class="sw sw-nd"></i>Sin dato o por revisar</span></div>
+        <div class="chart" id="g-bars"></div>
+      </div>
+      <div class="card">
+        <h3>Anuncios nuevos por día</h3>
+        <p class="note">Primera vez que Google mostró el anuncio, del <span class="f-ini">—</span> al <span class="f-fin">—</span>.</p>
+        <div class="legend" id="g-legend"></div>
+        <div class="chart" id="g-dias"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Todos los anuncios en Google</h2>
+    <div class="card">
+      <div class="controls"><div class="chips" id="g-chips" role="group" aria-label="Filtrar Google por marca"></div></div>
+      <div class="controls"><div class="chips" id="g-cyber-chips" role="group" aria-label="Filtrar Google por Cyber"></div></div>
+      <p class="note">Mostrando <span id="g-conteo">—</span> anuncios, del más reciente al más antiguo. Haz clic en la imagen para verla en grande, o en el texto para abrir el anuncio en Google.</p>
+      <div class="tablewrap ads">
+        <table>
+          <thead><tr><th>Creatividad</th><th>Marca</th><th>Primera vez</th><th>Formato</th><th>Texto</th><th>Cyber</th><th>Anunciante</th></tr></thead>
+          <tbody id="g-tabla"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+  </div>
+
+  <div class="panel" data-panel="comparar" role="tabpanel" hidden>
+  <div class="head">
+    <p class="lead">Cómo reparte cada marca su Cyber entre Meta y Google.</p>
+    <p class="meta">Meta: anuncios activos que mencionan Cyber (4 nov). Google: anuncios nuevos desde el 28 oct confirmados como Cyber (5 nov). Las dos fuentes no miden lo mismo, así que compara el peso de cada canal dentro de una marca más que los números absolutos.</p>
+  </div>
+  <section class="section">
+    <div class="card">
+      <h3>Anuncios Cyber por canal</h3>
+      <p class="note">Por marca, anuncios Cyber en Meta y anuncios Cyber confirmados en Google.</p>
+      <div class="legend"><span><i class="sw" style="background: var(--c1)"></i>Meta</span><span><i class="sw" style="background: var(--c3)"></i>Google</span></div>
+      <div class="chart" id="cmp-bars"></div>
+    </div>
+    <div class="card">
+      <h3>Detalle por marca</h3>
+      <p class="note">"Pagados por terceros" son anuncios de Google pagados por otras empresas (por ejemplo Acer) que llevan al sitio de la marca.</p>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Marca</th><th class="r">Meta: Cyber</th><th class="r">Google: nuevos</th><th class="r">Google: Cyber</th><th class="r">Google: sin dato</th><th class="r">Pagados por terceros</th><th class="r">Peso de Meta en su Cyber</th></tr></thead>
+          <tbody id="tabla-canales"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+  </div>
+
+  <footer>Fuentes: Meta Ad Library (anuncios activos, Perú) y Google Ads Transparency Center (anuncios nuevos desde el 28 oct, Perú). Los temas y el % de descuento se detectan por palabras en el texto del anuncio; no incluyen lo que aparece solo en la imagen. Uso interno.</footer>
+</div>
+<div class="visor" id="visor" role="dialog" aria-modal="true" aria-label="Creatividad del anuncio" hidden></div>
+
+<script>
+// Carga: anuncios/data/index.json (días disponibles), el día elegido y el anterior (para marcar lo nuevo).
+// Se elige el día con #AAAA-MM-DD en el link.
+(async () => {
+  const estado = document.getElementById('estado');
+  const sel = document.getElementById('daySelect');
+  const get = async (u) => { const r = await fetch(u, { cache: 'no-cache' }); if (!r.ok) throw new Error(`${u}: ${r.status}`); return r.json(); };
+  const MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+  const largo = (d) => `${+d.slice(8, 10)} ${MESES[+d.slice(5, 7) - 1]} ${d.slice(0, 4)}`;
+  try {
+    const index = await get('anuncios/data/index.json');
+    const days = index.days.map((d) => d.date);
+    if (!days.length) { estado.textContent = 'Todavía no hay capturas de anuncios.'; return; }
+    const pedido = location.hash.slice(1).match(/^\d{4}-\d{2}-\d{2}/)?.[0];
+    const date = days.includes(pedido) ? pedido : days.at(-1);
+    days.slice().reverse().forEach((d) => sel.add(new Option(largo(d), d, false, d === date)));
+    const go = (d) => { location.hash = d; location.reload(); };
+    sel.addEventListener('change', () => go(sel.value));
+    const i = days.indexOf(date);
+    document.getElementById('prevDay').disabled = i <= 0;
+    document.getElementById('nextDay').disabled = i >= days.length - 1;
+    document.getElementById('prevDay').addEventListener('click', () => i > 0 && go(days[i - 1]));
+    document.getElementById('nextDay').addEventListener('click', () => i < days.length - 1 && go(days[i + 1]));
+
+    const day = await get(`anuncios/data/${date}.json`);
+    const prevDate = days[i - 1];
+    const prev = prevDate ? await get(`anuncios/data/${prevDate}.json`).catch(() => null) : null;
+    const prevMeta = new Set((prev?.meta?.ads || []).map((a) => a.url));
+    const prevGoogle = new Set((prev?.google?.ads || []).map((a) => a.url));
+    const todayMeta = new Set((day.meta?.ads || []).map((a) => a.url));
+    const todayGoogle = new Set((day.google?.ads || []).map((a) => a.url));
+
+    // Adaptador: el dashboard trabaja con los nombres de campo en español.
+    const meta = (day.meta?.ads || []).map((a) => ({
+      marca: a.brandName, grupo: a.group, fecha_inicio: a.startDate, formato: a.format, versiones: a.versions,
+      texto: a.text, titular: a.headline, cta: a.cta, dscto_max: a.maxDiscount, menciona_app: a.app,
+      menciona_cuotas: a.installments, ad_url: a.url, nuevo: Boolean(prev) && !prevMeta.has(a.url),
+    }));
+    const google = (day.google?.ads || []).map((a) => ({
+      ad_url: a.url, marca: a.brandName, anunciante: a.advertiser, tercero: a.thirdParty, formato: a.format,
+      primera_vez: a.firstShown, ultima_vez: a.lastShown, titulares: a.headlines, descripcion: a.description,
+      es_cyber: a.cyber, metodo_cyber: a.method, nuevo: Boolean(prev) && !prevGoogle.has(a.url),
+    }));
+    const thumbs = (ads) => new Map(ads.filter((a) => a.img).map((a) => [a.url, a.img]));
+    const fallas = [...(day.meta?.brands || []).filter((b) => b.status !== 'ok').map((b) => `Meta ${b.name}`),
+      ...(day.google?.brands || []).filter((b) => b.status !== 'ok').map((b) => `Google ${b.name}`)];
+    const cambios = prev
+      ? `Frente al ${largo(prevDate)}: Meta +${meta.filter((r) => r.nuevo).length} nuevos, −${[...prevMeta].filter((u) => !todayMeta.has(u)).length} que salieron · Google +${google.filter((r) => r.nuevo).length} nuevos.`
+      : 'Primer día capturado: desde mañana se marcan los anuncios nuevos.';
+    estado.textContent = `Captura del ${largo(date)} · ${cambios}${fallas.length ? ` · Sin datos hoy: ${fallas.join(', ')}` : ''}`;
+
+    window.cwRender({
+      config: { campania: day.campaign, palabra_clave: day.keyword, fecha_inicio: day.startDate, fecha_fin: day.endDate && day.endDate < date ? day.endDate : date },
+      marcas: [...(day.meta?.brands || []), ...(day.google?.brands || [])].map((b) => ({ marca: b.name })),
+      meta, google, thumbsMeta: thumbs(day.meta?.ads || []), thumbsGoogle: thumbs(day.google?.ads || []),
+    });
+  } catch (e) {
+    estado.textContent = `No se pudieron cargar los datos: ${e.message}`;
+  }
+})();
+
+window.cwRender = (D) => {
+  const CFG = D.config || {};
+  document.getElementById('campania').textContent = CFG.campania || 'Cyber Monitor';
+  document.title = `${CFG.campania || 'Cyber Monitor'} · competencia`;
+  const fmtCfg = (s) => (/^\d{4}-\d{2}-\d{2}$/.test(s || '') ? `${+s.slice(8, 10)} ${['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'][+s.slice(5, 7) - 1]}` : (s || '—'));
+  document.querySelectorAll('.f-ini').forEach((e) => { e.textContent = fmtCfg(CFG.fecha_inicio); });
+  document.querySelectorAll('.f-fin').forEach((e) => { e.textContent = fmtCfg(CFG.fecha_fin); });
+  document.querySelectorAll('.clave').forEach((e) => { e.textContent = CFG.palabra_clave || 'cyber'; });
+  const F_INI = CFG.fecha_inicio || '2000-01-01';
+  const F_FIN = CFG.fecha_fin || new Date().toISOString().slice(0, 10);
+  const ADS = D.meta || [];
+  const THUMBS = D.thumbsMeta;
+  // Marcas de anuncios.json (las que trae el día), más cualquier otra que aparezca en los datos
+  const BRANDS = Array.from(new Set([...(D.marcas || []).map((m) => m.marca), ...ADS.map((r) => r.marca), ...(D.google || []).map((r) => r.marca)].filter(Boolean)));
+  const css = getComputedStyle(document.documentElement);
+  const color = (m) => `var(--c${(Math.max(0, BRANDS.indexOf(m)) % 6) + 1})`;
+  const pct = (v) => `${Math.round(v * 100)}%`;
+  const int = (v) => Number(v).toLocaleString('es-PE');
+  const MES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+  const fdate = (s) => (/^\d{4}-\d{2}-\d{2}$/.test(s || '') ? `${+s.slice(8, 10)} ${MES[+s.slice(5, 7) - 1]}` : (s || ''));
+  const $ = (id) => document.getElementById(id);
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+  const swatch = (m) => { const s = el('i', 'sw'); s.style.background = color(m); return s; };
+  const brandCell = (m) => { const s = el('span', 'brand'); s.append(swatch(m), document.createTextNode(m)); return s; };
+  const brandNew = (r) => { const s = brandCell(r.marca); if (r.nuevo) s.appendChild(el('span', 'pill pill-nuevo', 'Nuevo')); return s; };
+  const NS = 'http://www.w3.org/2000/svg';
+  const svgEl = (tag, attrs) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); return e; };
+
+  // Indicadores
+  const n = ADS.length;
+  const share = (arr, f) => (arr.length ? arr.filter(f).length / arr.length : 0);
+  const byBrand = BRANDS.map((m) => {
+    const a = ADS.filter((r) => r.marca === m);
+    const dsc = a.map((r) => Number(r.dscto_max)).filter((x) => x > 0);
+    const fechas = a.map((r) => r.fecha_inicio).filter((f) => /^\d{4}-/.test(f)).sort();
+    return {
+      marca: m, grupo: a[0] ? a[0].grupo : '', anuncios: a.length,
+      pct_video: share(a, (r) => r.formato === 'video'), pct_app: share(a, (r) => r.menciona_app === true),
+      pct_dscto: share(a, (r) => Number(r.dscto_max) > 0), pct_cuotas: share(a, (r) => r.menciona_cuotas === true),
+      dscto_max: dsc.length ? Math.max(...dsc) : null,
+      primer: fechas.filter((f) => f >= F_INI)[0] || fechas[0] || '',
+    };
+  }).filter((b) => b.anuncios).sort((x, y) => y.anuncios - x.anuncios);
+  const allDsc = ADS.map((r) => Number(r.dscto_max)).filter((x) => x > 0);
+  $('lider').textContent = byBrand[0] ? byBrand[0].marca : '—';
+  $('lider-n').textContent = byBrand[0] ? int(byBrand[0].anuncios) : '0';
+  $('pct-gf').textContent = pct(share(ADS, (r) => r.grupo === 'Grupo Falabella'));
+  $('k-total').textContent = int(n);
+  $('k-nov').textContent = pct(share(ADS, (r) => r.fecha_inicio >= F_INI));
+  $('k-video').textContent = pct(share(ADS, (r) => r.formato === 'video'));
+  $('k-app').textContent = pct(share(ADS, (r) => r.menciona_app === true));
+  $('k-dscto').textContent = allDsc.length ? `${Math.max(...allDsc)}%` : '—';
+  $('antes').textContent = int(ADS.filter((r) => /^\d{4}-/.test(r.fecha_inicio) && r.fecha_inicio < F_INI).length);
+
+  const tipFor = (box) => { const t = el('div', 'tip'); t.hidden = true; box.appendChild(t); return t; };
+  const place = (box, tip, ev) => {
+    const b = box.getBoundingClientRect(); tip.hidden = false;
+    let x = ev.clientX - b.left + 12, y = ev.clientY - b.top + 12;
+    if (x + tip.offsetWidth > b.width) x = Math.max(0, ev.clientX - b.left - tip.offsetWidth - 12);
+    if (y + tip.offsetHeight > b.height) y = Math.max(0, b.height - tip.offsetHeight);
+    tip.style.left = `${x}px`; tip.style.top = `${y}px`;
+  };
+
+  // Barras por marca
+  const drawBrands = () => {
+    const box = $('bars-marca'); box.replaceChildren();
+    const W = Math.max(280, box.clientWidth), rowH = 36, H = byBrand.length * rowH + 8, lab = 78, numW = 40;
+    const max = Math.max(1, ...byBrand.map((b) => b.anuncios));
+    const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}` });
+    const tip = tipFor(box);
+    byBrand.forEach((b, i) => {
+      const y = 6 + i * rowH, w = Math.max(1, (W - lab - numW) * b.anuncios / max);
+      const t1 = svgEl('text', { x: lab - 10, y: y + 14, 'text-anchor': 'end', 'font-size': 12, fill: 'currentColor' }); t1.textContent = b.marca;
+      const r = svgEl('rect', { x: lab, y: y + 2, width: w, height: 24, rx: 3 }); r.style.fill = color(b.marca);
+      r.addEventListener('pointermove', (ev) => { tip.replaceChildren(el('div', 'th', `${b.marca} · ${b.grupo}`), el('div', '', `${int(b.anuncios)} anuncios · ${pct(b.pct_video)} video`)); place(box, tip, ev); });
+      r.addEventListener('pointerleave', () => { tip.hidden = true; });
+      const t2 = svgEl('text', { x: lab + w + 6, y: y + 18, 'font-size': 12 }); t2.style.fill = 'var(--muted)'; t2.textContent = int(b.anuncios);
+      svg.append(t1, r, t2);
+    });
+    box.prepend(svg);
+  };
+
+  // Barras apiladas por día
+  BRANDS.filter((m) => byBrand.some((b) => b.marca === m)).forEach((m) => { const s = el('span'); s.append(swatch(m), document.createTextNode(m)); $('legend').appendChild(s); });
+  const rango = (a, b) => { const o = []; for (let d = new Date(a + 'T00:00:00Z'); d <= new Date(b + 'T00:00:00Z') && o.length < 120; d.setUTCDate(d.getUTCDate() + 1)) o.push(d.toISOString().slice(0, 10)); return o; };
+  const days = rango(F_INI, F_FIN);
+  const perDay = days.map((f) => { const o = { fecha: f }; BRANDS.forEach((m) => { o[m] = ADS.filter((r) => r.fecha_inicio === f && r.marca === m).length; }); return o; });
+  const drawDays = () => {
+    const box = $('bars-dia'); box.replaceChildren();
+    const W = Math.max(280, box.clientWidth), H = 230, left = 34, bottom = 22, top = 10;
+    const tot = perDay.map((o) => BRANDS.reduce((s, m) => s + o[m], 0));
+    const step = Math.max(10, Math.ceil(Math.max(...tot) / 4 / 10) * 10), maxY = step * 4;
+    const y = (v) => H - bottom - (H - bottom - top) * v / maxY;
+    const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}` });
+    for (let v = 0; v <= maxY; v += step) {
+      const l = svgEl('line', { x1: left, x2: W - 4, y1: y(v), y2: y(v) }); l.style.stroke = 'var(--grid)';
+      const t = svgEl('text', { x: left - 6, y: y(v) + 4, 'text-anchor': 'end', 'font-size': 11 }); t.style.fill = 'var(--muted)'; t.textContent = v;
+      svg.append(l, t);
+    }
+    const band = (W - 4 - left) / days.length, bw = Math.min(32, band * 0.72);
+    const tip = tipFor(box);
+    perDay.forEach((o, i) => {
+      const x = left + i * band + (band - bw) / 2; let acc = 0;
+      BRANDS.forEach((m) => { if (!o[m]) return; const r = svgEl('rect', { x, width: bw, y: y(acc + o[m]), height: y(acc) - y(acc + o[m]) }); r.style.fill = color(m); svg.appendChild(r); acc += o[m]; });
+      if (band >= 30 || i % 2 === 0) { const t = svgEl('text', { x: left + i * band + band / 2, y: H - 6, 'text-anchor': 'middle', 'font-size': 11 }); t.style.fill = 'var(--muted)'; t.textContent = fdate(o.fecha); svg.appendChild(t); }
+      const hit = svgEl('rect', { x: left + i * band, width: band, y: 0, height: H - bottom, fill: 'transparent' });
+      hit.addEventListener('pointermove', (ev) => {
+        tip.replaceChildren(el('div', 'th', `${fdate(o.fecha)} · ${int(tot[i])} anuncios`));
+        BRANDS.filter((m) => o[m]).forEach((m) => { const d = el('div'); d.append(swatch(m), document.createTextNode(`${m}: ${o[m]}`)); tip.appendChild(d); });
+        place(box, tip, ev);
+      });
+      hit.addEventListener('pointerleave', () => { tip.hidden = true; });
+      svg.appendChild(hit);
+    });
+    box.prepend(svg);
+  };
+
+  // Tabla por marca
+  byBrand.forEach((b) => {
+    const tr = el('tr');
+    const td = (c, cls) => { const t = el('td', cls); if (typeof c === 'string') t.textContent = c; else t.appendChild(c); tr.appendChild(t); };
+    td(brandCell(b.marca)); td(b.grupo); td(int(b.anuncios), 'r');
+    ['pct_video', 'pct_app', 'pct_dscto', 'pct_cuotas'].forEach((k) => { const w = el('span', 'bar'); const i = el('i'); i.style.width = `${Math.round(b[k] * 48)}px`; w.append(i, document.createTextNode(pct(b[k]))); td(w, 'r'); });
+    td(b.dscto_max == null ? '—' : `${b.dscto_max}%`, 'r'); td(fdate(b.primer), 'r');
+    $('tabla-marca').appendChild(tr);
+  });
+
+  // Tabla de anuncios con filtros
+  const state = { marca: '', q: '' };
+  const chips = () => {
+    const box = $('chips'); box.replaceChildren();
+    [['Todas', ''], ...byBrand.map((b) => [b.marca, b.marca])].forEach(([label, v]) => {
+      const c = el('button', 'chip', label); c.type = 'button'; c.setAttribute('aria-pressed', String(state.marca === v));
+      c.addEventListener('click', () => { state.marca = v; chips(); drawAds(); });
+      box.appendChild(c);
+    });
+  };
+  const drawAds = () => {
+    const q = state.q.trim().toLowerCase();
+    const rows = ADS.filter((r) => !state.marca || r.marca === state.marca)
+      .filter((r) => !q || `${r.texto} ${r.titular} ${r.cta}`.toLowerCase().includes(q))
+      .sort((a, b) => (a.fecha_inicio < b.fecha_inicio ? 1 : a.fecha_inicio > b.fecha_inicio ? -1 : 0));
+    $('conteo').textContent = `${int(rows.length)} de ${int(n)}`;
+    const body = $('tabla-anuncios'); body.replaceChildren();
+    rows.forEach((r) => {
+      const tr = el('tr');
+      const td = (c, cls) => { const t = el('td', cls); if (typeof c === 'string') t.textContent = c; else t.appendChild(c); tr.appendChild(t); };
+      const src = THUMBS.get(r.ad_url);
+      if (src) {
+        const b = el('button', 'thumb'); b.type = 'button'; b.setAttribute('aria-label', `Ver creatividad de ${r.marca}`);
+        const img = el('img'); img.src = src; img.alt = ''; img.loading = 'lazy'; b.appendChild(img);
+        b.addEventListener('click', () => openVisor(r, src)); td(b);
+      } else td('—');
+      td(brandNew(r)); td(fdate(r.fecha_inicio)); td(el('span', 'pill', r.formato || '—'));
+      const a = el('a'); a.href = r.ad_url; a.target = '_blank'; a.rel = 'noopener'; a.title = 'Abrir en Meta Ad Library'; a.appendChild(el('span', 'clamp', r.texto || r.titular)); td(a, 'txt');
+      td(r.cta || '—'); td(r.dscto_max == null ? '—' : `${r.dscto_max}%`, 'r');
+      body.appendChild(tr);
+    });
+  };
+  $('search').addEventListener('input', (e) => { state.q = e.target.value; drawAds(); });
+
+  // Visor
+  const visor = $('visor');
+  const closeVisor = () => { visor.hidden = true; visor.replaceChildren(); };
+  const openVisor = (r, src) => {
+    const card = el('div', 'visor-card');
+    const img = el('img'); img.src = src; img.alt = `Creatividad de ${r.marca}`;
+    const info = el('div', 'visor-info');
+    const link = el('a', '', /adstransparency\.google/.test(r.ad_url) ? 'Abrir en Google Ads Transparency' : 'Abrir en Meta Ad Library'); link.href = r.ad_url; link.target = '_blank'; link.rel = 'noopener';
+    const close = el('button', 'close', 'Cerrar'); close.type = 'button'; close.addEventListener('click', closeVisor);
+    info.append(el('strong', '', r.marca), el('span', 'note', `Desde ${fdate(r.fecha_inicio)} · ${r.formato || '—'}${r.cta ? ' · ' + r.cta : ''}`), el('p', '', r.texto || r.titular), link, close);
+    card.append(img, info); visor.replaceChildren(card); visor.hidden = false; close.focus();
+  };
+  visor.addEventListener('click', (e) => { if (e.target === visor) closeVisor(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !visor.hidden) closeVisor(); });
+
+  // ---- Google ----
+  const G = (D.google || []).map((r) => Object.assign({}, r, { es_cyber: r.es_cyber || 'Sin dato', tercero: r.tercero === true || r.tercero === 'TRUE' }));
+  const GTHUMBS = D.thumbsGoogle;
+  const esPend = (r) => r.es_cyber !== 'Sí' && r.es_cyber !== 'No';
+  const gc = (v) => G.filter((r) => r.es_cyber === v).length;
+  const gSi = gc('Sí'), gNo = gc('No');
+  $('g-total').textContent = int(G.length);
+  $('g-cyber').textContent = int(gSi);
+  $('g-pct').textContent = gSi + gNo ? pct(gSi / (gSi + gNo)) : '—';
+  $('g-sindato').textContent = int(G.filter(esPend).length);
+
+  const canales = BRANDS.map((m) => {
+    const g = G.filter((r) => r.marca === m);
+    return { marca: m, meta: ADS.filter((r) => r.marca === m).length, nuevos: g.length, cyber: g.filter((r) => r.es_cyber === 'Sí').length, sd: g.filter(esPend).length, ter: g.filter((r) => r.tercero === true).length };
+  }).sort((a, b) => (b.meta + b.cyber) - (a.meta + a.cyber));
+  canales.forEach((c) => {
+    const tr = el('tr');
+    const td = (x, cls) => { const t = el('td', cls); if (typeof x === 'string') t.textContent = x; else t.appendChild(x); tr.appendChild(t); };
+    td(brandCell(c.marca)); [c.meta, c.nuevos, c.cyber, c.sd, c.ter].forEach((v) => td(int(v), 'r'));
+    td(c.meta + c.cyber ? pct(c.meta / (c.meta + c.cyber)) : '—', 'r');
+    $('tabla-canales').appendChild(tr);
+  });
+
+  const gLider = canales.slice().sort((a, b) => b.nuevos - a.nuevos)[0];
+  $('g-lider').textContent = gLider && gLider.nuevos ? gLider.marca : '—';
+  $('g-lider-n').textContent = int(gLider ? gLider.nuevos : 0);
+  $('g-lider-cyber').textContent = int(gLider ? gLider.cyber : 0);
+
+  // Barras horizontales con segmentos: rows [{label, color, segs:[{v, fill, dashed, name}]}]
+  const hbars = (box, rows, tipLine) => {
+    box.replaceChildren();
+    const W = Math.max(280, box.clientWidth), rowH = 36, H = rows.length * rowH + 8, lab = 78, numW = 44;
+    const max = Math.max(1, ...rows.map((r) => r.segs.reduce((s, x) => s + x.v, 0)));
+    const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}` });
+    const tip = tipFor(box);
+    rows.forEach((r, i) => {
+      const y = 6 + i * rowH; let x = lab;
+      const t1 = svgEl('text', { x: lab - 10, y: y + 14, 'text-anchor': 'end', 'font-size': 12, fill: 'currentColor' }); t1.textContent = r.label; svg.appendChild(t1);
+      r.segs.forEach((s) => {
+        if (!s.v) return;
+        const w = (W - lab - numW) * s.v / max;
+        const rect = svgEl('rect', { x, y: y + 2, width: Math.max(1, w), height: 24, rx: 2 });
+        rect.style.fill = s.fill; if (s.dashed) { rect.style.stroke = 'var(--muted)'; rect.setAttribute('stroke-dasharray', '3 2'); }
+        svg.appendChild(rect); x += w;
+      });
+      const total = r.segs.reduce((s, x) => s + x.v, 0);
+      const t2 = svgEl('text', { x: x + 6, y: y + 18, 'font-size': 12 }); t2.style.fill = 'var(--muted)'; t2.textContent = int(total); svg.appendChild(t2);
+      const hit = svgEl('rect', { x: 0, y, width: W, height: rowH, fill: 'transparent' });
+      hit.addEventListener('pointermove', (ev) => { tip.replaceChildren(el('div', 'th', r.label), ...r.segs.map((s) => el('div', '', `${s.name}: ${int(s.v)}`))); place(box, tip, ev); });
+      hit.addEventListener('pointerleave', () => { tip.hidden = true; });
+      svg.appendChild(hit);
+    });
+    box.prepend(svg);
+  };
+  const drawGBars = () => hbars($('g-bars'), canales.filter((c) => c.nuevos).sort((a, b) => b.nuevos - a.nuevos).map((c) => ({
+    label: c.marca,
+    segs: [
+      { name: 'Cyber', v: c.cyber, fill: 'var(--c2)' },
+      { name: 'No Cyber', v: c.nuevos - c.cyber - c.sd, fill: 'var(--bar-muted)' },
+      { name: 'Sin dato o por revisar', v: c.sd, fill: 'transparent', dashed: true },
+    ],
+  })));
+  const drawCompare = () => {
+    const box = $('cmp-bars'); box.replaceChildren();
+    const W = Math.max(280, box.clientWidth), rowH = 54, H = canales.length * rowH + 8, lab = 78, numW = 40;
+    const max = Math.max(1, ...canales.map((c) => Math.max(c.meta, c.cyber)));
+    const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}` });
+    canales.forEach((c, i) => {
+      const y = 6 + i * rowH;
+      const t1 = svgEl('text', { x: lab - 10, y: y + 24, 'text-anchor': 'end', 'font-size': 12, fill: 'currentColor' }); t1.textContent = c.marca; svg.appendChild(t1);
+      [[c.meta, 'var(--c1)', 0], [c.cyber, 'var(--c3)', 22]].forEach(([v, fill, dy]) => {
+        const w = Math.max(1, (W - lab - numW) * v / max);
+        const r = svgEl('rect', { x: lab, y: y + dy + 2, width: w, height: 18, rx: 2 }); r.style.fill = fill; svg.appendChild(r);
+        const t = svgEl('text', { x: lab + w + 6, y: y + dy + 15, 'font-size': 12 }); t.style.fill = 'var(--muted)'; t.textContent = int(v); svg.appendChild(t);
+      });
+    });
+    box.prepend(svg);
+  };
+
+  // Google: anuncios nuevos por día y marca
+  const gDays = rango(F_INI, F_FIN);
+  BRANDS.filter((m) => G.some((r) => r.marca === m)).forEach((m) => { const s = el('span'); s.append(swatch(m), document.createTextNode(m)); $('g-legend').appendChild(s); });
+  const gPerDay = gDays.map((f) => { const o = { fecha: f }; BRANDS.forEach((m) => { o[m] = G.filter((r) => r.primera_vez === f && r.marca === m).length; }); return o; });
+  const drawGDays = () => {
+    const box = $('g-dias'); box.replaceChildren();
+    const W = Math.max(280, box.clientWidth), H = 230, left = 34, bottom = 22, top = 10;
+    const tot = gPerDay.map((o) => BRANDS.reduce((s, m) => s + o[m], 0));
+    const step = Math.max(10, Math.ceil(Math.max(...tot) / 4 / 10) * 10), maxY = step * 4;
+    const y = (v) => H - bottom - (H - bottom - top) * v / maxY;
+    const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}` });
+    for (let v = 0; v <= maxY; v += step) {
+      const l = svgEl('line', { x1: left, x2: W - 4, y1: y(v), y2: y(v) }); l.style.stroke = 'var(--grid)';
+      const t = svgEl('text', { x: left - 6, y: y(v) + 4, 'text-anchor': 'end', 'font-size': 11 }); t.style.fill = 'var(--muted)'; t.textContent = v;
+      svg.append(l, t);
+    }
+    const band = (W - 4 - left) / gDays.length, bw = Math.min(32, band * 0.72);
+    const tip = tipFor(box);
+    gPerDay.forEach((o, i) => {
+      const x = left + i * band + (band - bw) / 2; let acc = 0;
+      BRANDS.forEach((m) => { if (!o[m]) return; const r = svgEl('rect', { x, width: bw, y: y(acc + o[m]), height: y(acc) - y(acc + o[m]) }); r.style.fill = color(m); svg.appendChild(r); acc += o[m]; });
+      if (band >= 30 || i % 2 === 0) { const t = svgEl('text', { x: left + i * band + band / 2, y: H - 6, 'text-anchor': 'middle', 'font-size': 11 }); t.style.fill = 'var(--muted)'; t.textContent = fdate(o.fecha); svg.appendChild(t); }
+      const hit = svgEl('rect', { x: left + i * band, width: band, y: 0, height: H - bottom, fill: 'transparent' });
+      hit.addEventListener('pointermove', (ev) => {
+        tip.replaceChildren(el('div', 'th', `${fdate(o.fecha)} · ${int(tot[i])} anuncios`));
+        BRANDS.filter((m) => o[m]).forEach((m) => { const d = el('div'); d.append(swatch(m), document.createTextNode(`${m}: ${o[m]}`)); tip.appendChild(d); });
+        place(box, tip, ev);
+      });
+      hit.addEventListener('pointerleave', () => { tip.hidden = true; });
+      svg.appendChild(hit);
+    });
+    box.prepend(svg);
+  };
+
+  const gstate = { marca: '', cyber: '' };
+  const gChips = () => {
+    const box = $('g-chips'); box.replaceChildren();
+    [['Todas', ''], ...canales.filter((c) => c.nuevos).map((c) => [c.marca, c.marca])].forEach(([label, v]) => {
+      const b = el('button', 'chip', label); b.type = 'button'; b.setAttribute('aria-pressed', String(gstate.marca === v));
+      b.addEventListener('click', () => { gstate.marca = v; gChips(); drawG(); }); box.appendChild(b);
+    });
+    const box2 = $('g-cyber-chips'); box2.replaceChildren();
+    [['Todos', ''], ['Cyber', 'Sí'], ['No Cyber', 'No'], ['Por revisar', 'Por revisar'], ['Sin dato', 'Sin dato']].forEach(([label, v]) => {
+      const b = el('button', 'chip', label); b.type = 'button'; b.setAttribute('aria-pressed', String(gstate.cyber === v));
+      b.addEventListener('click', () => { gstate.cyber = v; gChips(); drawG(); }); box2.appendChild(b);
+    });
+  };
+  const drawG = () => {
+    const rows = G.filter((r) => !gstate.marca || r.marca === gstate.marca).filter((r) => !gstate.cyber || r.es_cyber === gstate.cyber)
+      .sort((a, b) => (a.primera_vez < b.primera_vez ? 1 : a.primera_vez > b.primera_vez ? -1 : 0));
+    $('g-conteo').textContent = `${int(rows.length)} de ${int(G.length)}`;
+    const body = $('g-tabla'); body.replaceChildren();
+    rows.forEach((r) => {
+      const tr = el('tr');
+      const td = (x, cls) => { const t = el('td', cls); if (typeof x === 'string') t.textContent = x; else t.appendChild(x); tr.appendChild(t); };
+      const src = GTHUMBS.get(r.ad_url);
+      const texto = [r.titulares, r.descripcion].filter(Boolean).join(' — ');
+      if (src) {
+        const b = el('button', 'thumb'); b.type = 'button'; b.setAttribute('aria-label', `Ver creatividad de ${r.marca}`);
+        const img = el('img'); img.src = src; img.alt = ''; img.loading = 'lazy'; b.appendChild(img);
+        b.addEventListener('click', () => openVisor({ marca: r.marca, fecha_inicio: r.primera_vez, formato: `${r.formato} · Google`, cta: r.es_cyber === 'Sí' ? 'Cyber' : '', texto: texto || r.anunciante, ad_url: r.ad_url }, src));
+        td(b);
+      } else td('—');
+      td(brandNew(r)); td(fdate(r.primera_vez)); td(el('span', 'pill', r.formato || '—'));
+      const a = el('a'); a.href = r.ad_url; a.target = '_blank'; a.rel = 'noopener'; a.title = 'Abrir en Google Ads Transparency Center'; a.appendChild(el('span', 'clamp', texto || 'Ver anuncio en Google')); td(a, 'txt');
+      td(el('span', 'pill ' + (r.es_cyber === 'Sí' ? 'pill-si' : esPend(r) ? 'pill-nd' : ''), r.es_cyber));
+      td(r.anunciante);
+      body.appendChild(tr);
+    });
+  };
+  gChips(); drawG();
+
+  // Pestañas
+  const drawers = { meta: [drawBrands, drawDays], google: [drawGBars, drawGDays], comparar: [drawCompare] };
+  let current = 'meta';
+  const showTab = (name) => {
+    if (!drawers[name]) name = 'meta';
+    current = name;
+    document.querySelectorAll('.tab').forEach((t) => t.setAttribute('aria-selected', String(t.dataset.tab === name)));
+    document.querySelectorAll('.panel').forEach((p) => { p.hidden = p.dataset.panel !== name; });
+    drawers[name].forEach((f) => f());
+  };
+  document.querySelectorAll('.tab').forEach((t) => t.addEventListener('click', () => { showTab(t.dataset.tab); window.scrollTo({ top: 0 }); }));
+
+  chips(); drawAds();
+  showTab('meta');
+  let rt; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => drawers[current].forEach((f) => f()), 150); });
+};
+</script>
+</body>
+</html>

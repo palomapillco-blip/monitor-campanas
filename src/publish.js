@@ -65,6 +65,8 @@ async function mergeInto(dir, run, srcDay) {
   if (srcDay) await mergeDay(dir, run, srcDay);
   if (!keepDashboard || !(await exists(path.join(dir, 'index.html')))) {
     await fs.copyFile(path.join(ROOT, 'index.html'), path.join(dir, 'index.html'));
+    // El dashboard de anuncios (src/anuncios.js) vive en el mismo sitio.
+    if (await exists(path.join(ROOT, 'anuncios.html'))) await fs.copyFile(path.join(ROOT, 'anuncios.html'), path.join(dir, 'anuncios.html'));
     await fs.cp(path.join(ROOT, 'assets'), path.join(dir, 'assets'), { recursive: true });
   }
   await fs.writeFile(path.join(dir, '.nojekyll'), '');

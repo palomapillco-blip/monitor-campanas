@@ -11,7 +11,9 @@
     "reindex": "node src/build-index.js",
     "prune": "node src/prune.js",
     "test:signals": "node src/test-signals.js",
-    "serve": "node src/serve.js"
+    "serve": "node src/serve.js",
+    "anuncios": "node src/anuncios.js",
+    "anuncios:publish": "node src/anuncios-publish.js"
   },
   "dependencies": {
     "playwright": "^1.49.0",
