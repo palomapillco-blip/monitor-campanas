@@ -6,6 +6,11 @@ on:
     # Meta suele bloquear a los servidores de GitHub, y en ese caso se conserva lo que publicó el Mac.
     # Horas en UTC (Lima = UTC−5).
     - cron: '45 13 * * *'   # 8:45 a. m.
+  # Prueba: al subir cambios a la rama monitor-anuncios corre la captura completa pero NO publica;
+  # deja el resultado como artefacto descargable de la corrida.
+  push:
+    branches: [monitor-anuncios]
+    paths: ['src/anuncios.js', 'src/anuncios-publish.js', 'anuncios.json', '.github/workflows/anuncios.yml']
   workflow_dispatch:
     inputs:
       only:
@@ -69,7 +74,27 @@ jobs:
           [ -n "$SOURCE" ] && set -- "$@" --source "$SOURCE"
           node --no-deprecation src/anuncios.js "$@"
 
+      - name: Resumen de la captura
+        if: always()
+        run: |
+          f=$(ls site/anuncios/data/2*.json 2>/dev/null | sort | tail -1)
+          [ -z "$f" ] && { echo "No se generó el archivo del día"; exit 0; }
+          echo "Archivo: $f"
+          jq -r '"META", (.meta.brands[] | "  \(.name): \(.status) · \(.count) con palabra clave de \(.seen // 0) · \(.error // "")"),
+                 "GOOGLE", (.google.brands[] | "  \(.name): \(.status) · \(.count) nuevos · \(.cyber) Cyber · \(.error // "")"),
+                 "Clasificación Google: \([.google.ads[].cyber] | group_by(.) | map("\(.[0]): \(length)") | join(", "))",
+                 "Miniaturas: Meta \([.meta.ads[] | select(.img)] | length)/\(.meta.ads | length) · Google \([.google.ads[] | select(.img)] | length)/\(.google.ads | length)"' "$f" | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Guardar resultado de la prueba
+        if: github.event_name == 'push' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: anuncios-prueba
+          path: site/anuncios
+          retention-days: 7
+
       - name: Publicar en gh-pages
+        if: github.event_name != 'push'
         env:
           PUBLISH_REMOTE: https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
         run: node src/anuncios-publish.js --from site
