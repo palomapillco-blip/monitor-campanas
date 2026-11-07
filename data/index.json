@@ -1,0 +1,1049 @@
+{
+ "updatedAt": "2026-11-07T12:09:11.357Z",
+ "latest": "2026-11-07",
+ "workbook": "data/monitor-campanas.xlsx",
+ "days": [
+  {
+   "date": "2026-11-02",
+   "generatedAt": "2026-11-02T22:00:50.266Z",
+   "sites": [
+    {
+     "id": "falabella",
+     "name": "Falabella",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [
+      "Cyber Wow",
+      "Navidad"
+     ],
+     "mechanics": 4,
+     "added": 0,
+     "removed": 0
+    },
+    {
+     "id": "ripley",
+     "name": "Ripley",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [
+      "Cyber Wow"
+     ],
+     "mechanics": 4,
+     "added": 0,
+     "removed": 0
+    },
+    {
+     "id": "wong",
+     "name": "Wong",
+     "status": "ok",
+     "maxDiscount": 60,
+     "campaigns": [
+      "Cyber Wow",
+      "Navidad"
+     ],
+     "mechanics": 23,
+     "added": 0,
+     "removed": 0
+    },
+    {
+     "id": "tottus",
+     "name": "Tottus",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [
+      "Cyber Wow"
+     ],
+     "mechanics": 5,
+     "added": 0,
+     "removed": 0
+    },
+    {
+     "id": "sodimac",
+     "name": "Sodimac",
+     "status": "ok",
+     "maxDiscount": 70,
+     "campaigns": [
+      "Cyber Wow",
+      "Navidad",
+      "Liquidación"
+     ],
+     "mechanics": 14,
+     "added": 0,
+     "removed": 0
+    },
+    {
+     "id": "mercadolibre",
+     "name": "Mercado Libre",
+     "status": "ok",
+     "maxDiscount": 60,
+     "campaigns": [
+      "Cyber Wow"
+     ],
+     "mechanics": 12,
+     "added": 0,
+     "removed": 0
+    }
+   ]
+  },
+  {
+   "date": "2026-11-03",
+   "generatedAt": "2026-11-03T22:13:52.929Z",
+   "sites": [
+    {
+     "id": "falabella",
+     "name": "Falabella",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [
+      "Cyber Wow",
+      "Navidad"
+     ],
+     "mechanics": 4,
+     "added": 1,
+     "removed": 1
+    },
+    {
+     "id": "ripley",
+     "name": "Ripley",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [
+      "Cyber Wow"
+     ],
+     "mechanics": 4,
+     "added": 1,
+     "removed": 1
+    },
+    {
+     "id": "wong",
+     "name": "Wong",
+     "status": "ok",
+     "maxDiscount": 60,
+     "campaigns": [
+      "Cyber Wow",
+      "Navidad"
+     ],
+     "mechanics": 23,
+     "added": 2,
+     "removed": 3
+    },
+    {
+     "id": "tottus",
+     "name": "Tottus",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [
+      "Cyber Wow"
+     ],
+     "mechanics": 5,
+     "added": 1,
+     "removed": 3
+    },
+    {
+     "id": "sodimac",
+     "name": "Sodimac",
+     "status": "ok",
+     "maxDiscount": 70,
+     "campaigns": [
+      "Cyber Wow",
+      "Navidad",
+      "Liquidación"
+     ],
+     "mechanics": 13,
+     "added": 0,
+     "removed": 1
+    },
+    {
+     "id": "mercadolibre",
+     "name": "Mercado Libre",
+     "status": "ok",
+     "maxDiscount": 60,
+     "campaigns": [
+      "Cyber Wow",
+      "Cyber Days"
+     ],
+     "mechanics": 11,
+     "added": 3,
+     "removed": 5
+    },
+    {
+     "id": "metro",
+     "name": "Metro",
+     "status": "ok",
+     "maxDiscount": 60,
+     "campaigns": [
+      "Cyber Wow",
+      "Navidad",
+      "Aniversario"
+     ],
+     "mechanics": 24,
+     "added": 0,
+     "removed": 0
+    },
+    {
+     "id": "coolbox",
+     "name": "Coolbox",
+     "status": "ok",
+     "maxDiscount": 57,
+     "campaigns": [
+      "Cyber Wow",
+      "Mega ofertas"
+     ],
+     "mechanics": 26,
+     "added": 0,
+     "removed": 0
+    },
+    {
+     "id": "hiraoka",
+     "name": "Hiraoka",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [
+      "Cyber Wow",
+      "Cyber Days"
+     ],
+     "mechanics": 7,
+     "added": 0,
+     "removed": 0
+    },
+    {
+     "id": "lacuracao",
+     "name": "La Curacao",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [
+      "Cyber Wow"
+     ],
+     "mechanics": 5,
+     "added": 0,
+     "removed": 0
+    },
+    {
+     "id": "efe",
+     "name": "Efe",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [
+      "Cyber Wow"
+     ],
+     "mechanics": 4,
+     "added": 0,
+     "removed": 0
+    },
+    {
+     "id": "boticasysalud",
+     "name": "Boticas y Salud",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [],
+     "mechanics": 4,
+     "added": 0,
+     "removed": 0
+    },
+    {
+     "id": "farmaciauniversal",
+     "name": "Farmacia Universal",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [],
+     "mechanics": 1,
+     "added": 0,
+     "removed": 0
+    },
+    {
+     "id": "estilos",
+     "name": "Estilos",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [
+      "Cyber",
+      "Liquidación"
+     ],
+     "mechanics": 4,
+     "added": 0,
+     "removed": 0
+    },
+    {
+     "id": "platanitos",
+     "name": "Platanitos",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [
+      "Cyber Wow"
+     ],
+     "mechanics": 3,
+     "added": 0,
+     "removed": 0
+    }
+   ]
+  },
+  {
+   "date": "2026-11-04",
+   "generatedAt": "2026-11-04T14:40:45.431Z",
+   "sites": [
+    {
+     "id": "falabella",
+     "name": "Falabella",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [
+      "Cyber Wow",
+      "Navidad"
+     ],
+     "mechanics": 4,
+     "added": 0,
+     "removed": 1
+    },
+    {
+     "id": "ripley",
+     "name": "Ripley",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [
+      "Cyber Wow"
+     ],
+     "mechanics": 6,
+     "added": 3,
+     "removed": 1
+    },
+    {
+     "id": "wong",
+     "name": "Wong",
+     "status": "ok",
+     "maxDiscount": 60,
+     "campaigns": [
+      "Cyber Wow",
+      "Navidad"
+     ],
+     "mechanics": 23,
+     "added": 3,
+     "removed": 2
+    },
+    {
+     "id": "tottus",
+     "name": "Tottus",
+     "status": "ok",
+     "maxDiscount": 70,
+     "campaigns": [
+      "Cyber Wow"
+     ],
+     "mechanics": 6,
+     "added": 6,
+     "removed": 2
+    },
+    {
+     "id": "sodimac",
+     "name": "Sodimac",
+     "status": "ok",
+     "maxDiscount": 70,
+     "campaigns": [
+      "Cyber Wow",
+      "Navidad",
+      "Liquidación"
+     ],
+     "mechanics": 15,
+     "added": 3,
+     "removed": 1
+    },
+    {
+     "id": "mercadolibre",
+     "name": "Mercado Libre",
+     "status": "ok",
+     "maxDiscount": 60,
+     "campaigns": [
+      "Cyber Wow"
+     ],
+     "mechanics": 9,
+     "added": 1,
+     "removed": 2
+    },
+    {
+     "id": "metro",
+     "name": "Metro",
+     "status": "ok",
+     "maxDiscount": 60,
+     "campaigns": [
+      "Cyber Wow",
+      "Navidad",
+      "Aniversario"
+     ],
+     "mechanics": 24,
+     "added": 0,
+     "removed": 0
+    },
+    {
+     "id": "coolbox",
+     "name": "Coolbox",
+     "status": "ok",
+     "maxDiscount": 63,
+     "campaigns": [
+      "Cyber Wow",
+      "Mega ofertas"
+     ],
+     "mechanics": 28,
+     "added": 7,
+     "removed": 5
+    },
+    {
+     "id": "hiraoka",
+     "name": "Hiraoka",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [
+      "Cyber Wow",
+      "Cyber Days"
+     ],
+     "mechanics": 7,
+     "added": 0,
+     "removed": 0
+    },
+    {
+     "id": "lacuracao",
+     "name": "La Curacao",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [
+      "Cyber Wow"
+     ],
+     "mechanics": 4,
+     "added": 0,
+     "removed": 1
+    },
+    {
+     "id": "efe",
+     "name": "Efe",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [
+      "Cyber Wow",
+      "Navidad"
+     ],
+     "mechanics": 5,
+     "added": 1,
+     "removed": 0
+    },
+    {
+     "id": "boticasysalud",
+     "name": "Boticas y Salud",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [],
+     "mechanics": 2,
+     "added": 0,
+     "removed": 2
+    },
+    {
+     "id": "farmaciauniversal",
+     "name": "Farmacia Universal",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [],
+     "mechanics": 2,
+     "added": 1,
+     "removed": 0
+    },
+    {
+     "id": "estilos",
+     "name": "Estilos",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [
+      "Cyber",
+      "Liquidación"
+     ],
+     "mechanics": 3,
+     "added": 0,
+     "removed": 2
+    },
+    {
+     "id": "platanitos",
+     "name": "Platanitos",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [
+      "Cyber Wow"
+     ],
+     "mechanics": 3,
+     "added": 0,
+     "removed": 0
+    }
+   ]
+  },
+  {
+   "date": "2026-11-05",
+   "generatedAt": "2026-11-05T15:03:04.771Z",
+   "sites": [
+    {
+     "id": "falabella",
+     "name": "Falabella",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [
+      "Cyber Wow",
+      "Navidad"
+     ],
+     "mechanics": 4,
+     "added": 0,
+     "removed": 1
+    },
+    {
+     "id": "ripley",
+     "name": "Ripley",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [
+      "Cyber Wow"
+     ],
+     "mechanics": 5,
+     "added": 1,
+     "removed": 2
+    },
+    {
+     "id": "wong",
+     "name": "Wong",
+     "status": "ok",
+     "maxDiscount": 60,
+     "campaigns": [
+      "Cyber Wow",
+      "Navidad"
+     ],
+     "mechanics": 24,
+     "added": 1,
+     "removed": 1
+    },
+    {
+     "id": "tottus",
+     "name": "Tottus",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [
+      "Cyber Wow",
+      "Navidad"
+     ],
+     "mechanics": 8,
+     "added": 5,
+     "removed": 6
+    },
+    {
+     "id": "sodimac",
+     "name": "Sodimac",
+     "status": "ok",
+     "maxDiscount": 70,
+     "campaigns": [
+      "Cyber Wow",
+      "Navidad",
+      "Liquidación"
+     ],
+     "mechanics": 15,
+     "added": 2,
+     "removed": 2
+    },
+    {
+     "id": "mercadolibre",
+     "name": "Mercado Libre",
+     "status": "ok",
+     "maxDiscount": 60,
+     "campaigns": [
+      "Cyber Wow"
+     ],
+     "mechanics": 9,
+     "added": 2,
+     "removed": 2
+    },
+    {
+     "id": "metro",
+     "name": "Metro",
+     "status": "ok",
+     "maxDiscount": 60,
+     "campaigns": [
+      "Cyber Wow",
+      "Navidad",
+      "Aniversario"
+     ],
+     "mechanics": 23,
+     "added": 1,
+     "removed": 2
+    },
+    {
+     "id": "coolbox",
+     "name": "Coolbox",
+     "status": "ok",
+     "maxDiscount": 66,
+     "campaigns": [
+      "Cyber Wow",
+      "Mega ofertas"
+     ],
+     "mechanics": 30,
+     "added": 8,
+     "removed": 6
+    },
+    {
+     "id": "hiraoka",
+     "name": "Hiraoka",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [
+      "Cyber Wow",
+      "Cyber Days"
+     ],
+     "mechanics": 6,
+     "added": 0,
+     "removed": 1
+    },
+    {
+     "id": "lacuracao",
+     "name": "La Curacao",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [
+      "Cyber Wow"
+     ],
+     "mechanics": 4,
+     "added": 0,
+     "removed": 0
+    },
+    {
+     "id": "efe",
+     "name": "Efe",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [
+      "Cyber Wow",
+      "Navidad"
+     ],
+     "mechanics": 5,
+     "added": 1,
+     "removed": 1
+    },
+    {
+     "id": "boticasysalud",
+     "name": "Boticas y Salud",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [],
+     "mechanics": 5,
+     "added": 3,
+     "removed": 0
+    },
+    {
+     "id": "farmaciauniversal",
+     "name": "Farmacia Universal",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [],
+     "mechanics": 1,
+     "added": 0,
+     "removed": 1
+    },
+    {
+     "id": "estilos",
+     "name": "Estilos",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [
+      "Cyber",
+      "Liquidación"
+     ],
+     "mechanics": 3,
+     "added": 0,
+     "removed": 1
+    },
+    {
+     "id": "platanitos",
+     "name": "Platanitos",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [
+      "Cyber Wow"
+     ],
+     "mechanics": 3,
+     "added": 1,
+     "removed": 0
+    }
+   ]
+  },
+  {
+   "date": "2026-11-06",
+   "generatedAt": "2026-11-06T12:09:16.706Z",
+   "sites": [
+    {
+     "id": "falabella",
+     "name": "Falabella",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [
+      "Navidad"
+     ],
+     "mechanics": 2,
+     "added": 2,
+     "removed": 4
+    },
+    {
+     "id": "ripley",
+     "name": "Ripley",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [],
+     "mechanics": 3,
+     "added": 3,
+     "removed": 2
+    },
+    {
+     "id": "wong",
+     "name": "Wong",
+     "status": "ok",
+     "maxDiscount": 60,
+     "campaigns": [
+      "Navidad",
+      "Cyber Wow"
+     ],
+     "mechanics": 25,
+     "added": 2,
+     "removed": 1
+    },
+    {
+     "id": "tottus",
+     "name": "Tottus",
+     "status": "ok",
+     "maxDiscount": 35,
+     "campaigns": [
+      "Navidad",
+      "Cyber Wow"
+     ],
+     "mechanics": 10,
+     "added": 7,
+     "removed": 2
+    },
+    {
+     "id": "sodimac",
+     "name": "Sodimac",
+     "status": "ok",
+     "maxDiscount": 70,
+     "campaigns": [
+      "Navidad",
+      "Liquidación",
+      "Cyber Wow"
+     ],
+     "mechanics": 13,
+     "added": 1,
+     "removed": 3
+    },
+    {
+     "id": "mercadolibre",
+     "name": "Mercado Libre",
+     "status": "ok",
+     "maxDiscount": 60,
+     "campaigns": [
+      "Cyber Wow",
+      "Liquidación",
+      "Mega ofertas"
+     ],
+     "mechanics": 20,
+     "added": 15,
+     "removed": 3
+    },
+    {
+     "id": "metro",
+     "name": "Metro",
+     "status": "ok",
+     "maxDiscount": 60,
+     "campaigns": [
+      "Cyber",
+      "Navidad",
+      "Aniversario"
+     ],
+     "mechanics": 21,
+     "added": 3,
+     "removed": 4
+    },
+    {
+     "id": "coolbox",
+     "name": "Coolbox",
+     "status": "ok",
+     "maxDiscount": 60,
+     "campaigns": [
+      "Mega ofertas",
+      "Cyber Wow"
+     ],
+     "mechanics": 29,
+     "added": 5,
+     "removed": 6
+    },
+    {
+     "id": "hiraoka",
+     "name": "Hiraoka",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [
+      "Cyber Wow",
+      "Cyber Days"
+     ],
+     "mechanics": 7,
+     "added": 1,
+     "removed": 0
+    },
+    {
+     "id": "lacuracao",
+     "name": "La Curacao",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [
+      "Cyber Wow"
+     ],
+     "mechanics": 4,
+     "added": 0,
+     "removed": 0
+    },
+    {
+     "id": "efe",
+     "name": "Efe",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [
+      "Cyber Wow"
+     ],
+     "mechanics": 4,
+     "added": 1,
+     "removed": 2
+    },
+    {
+     "id": "boticasysalud",
+     "name": "Boticas y Salud",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [],
+     "mechanics": 2,
+     "added": 0,
+     "removed": 3
+    },
+    {
+     "id": "farmaciauniversal",
+     "name": "Farmacia Universal",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [],
+     "mechanics": 1,
+     "added": 0,
+     "removed": 0
+    },
+    {
+     "id": "estilos",
+     "name": "Estilos",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [
+      "Cyber",
+      "Liquidación"
+     ],
+     "mechanics": 3,
+     "added": 0,
+     "removed": 0
+    },
+    {
+     "id": "platanitos",
+     "name": "Platanitos",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [
+      "Cyber Wow"
+     ],
+     "mechanics": 2,
+     "added": 1,
+     "removed": 1
+    }
+   ]
+  },
+  {
+   "date": "2026-11-07",
+   "generatedAt": "2026-11-07T12:09:11.287Z",
+   "sites": [
+    {
+     "id": "falabella",
+     "name": "Falabella",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [
+      "Navidad"
+     ],
+     "mechanics": 2,
+     "added": 0,
+     "removed": 0
+    },
+    {
+     "id": "ripley",
+     "name": "Ripley",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [
+      "Navidad",
+      "Halloween"
+     ],
+     "mechanics": 5,
+     "added": 2,
+     "removed": 3
+    },
+    {
+     "id": "wong",
+     "name": "Wong",
+     "status": "ok",
+     "maxDiscount": 60,
+     "campaigns": [
+      "Cyber Wow",
+      "Navidad"
+     ],
+     "mechanics": 23,
+     "added": 0,
+     "removed": 2
+    },
+    {
+     "id": "tottus",
+     "name": "Tottus",
+     "status": "ok",
+     "maxDiscount": 35,
+     "campaigns": [
+      "Navidad",
+      "Cyber Wow"
+     ],
+     "mechanics": 11,
+     "added": 1,
+     "removed": 0
+    },
+    {
+     "id": "sodimac",
+     "name": "Sodimac",
+     "status": "ok",
+     "maxDiscount": 70,
+     "campaigns": [
+      "Navidad",
+      "Liquidación",
+      "Cyber Wow"
+     ],
+     "mechanics": 12,
+     "added": 0,
+     "removed": 1
+    },
+    {
+     "id": "mercadolibre",
+     "name": "Mercado Libre",
+     "status": "ok",
+     "maxDiscount": 50,
+     "campaigns": [],
+     "mechanics": 10,
+     "added": 2,
+     "removed": 12
+    },
+    {
+     "id": "metro",
+     "name": "Metro",
+     "status": "ok",
+     "maxDiscount": 60,
+     "campaigns": [
+      "Cyber",
+      "Navidad",
+      "Aniversario"
+     ],
+     "mechanics": 19,
+     "added": 0,
+     "removed": 2
+    },
+    {
+     "id": "coolbox",
+     "name": "Coolbox",
+     "status": "ok",
+     "maxDiscount": 60,
+     "campaigns": [
+      "Mega ofertas",
+      "Cyber Wow"
+     ],
+     "mechanics": 25,
+     "added": 4,
+     "removed": 8
+    },
+    {
+     "id": "hiraoka",
+     "name": "Hiraoka",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [
+      "Cyber Wow",
+      "Cyber Days"
+     ],
+     "mechanics": 9,
+     "added": 3,
+     "removed": 1
+    },
+    {
+     "id": "lacuracao",
+     "name": "La Curacao",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [
+      "Cyber Wow"
+     ],
+     "mechanics": 5,
+     "added": 1,
+     "removed": 0
+    },
+    {
+     "id": "efe",
+     "name": "Efe",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [
+      "Cyber Wow"
+     ],
+     "mechanics": 4,
+     "added": 0,
+     "removed": 1
+    },
+    {
+     "id": "boticasysalud",
+     "name": "Boticas y Salud",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [
+      "Cyber"
+     ],
+     "mechanics": 3,
+     "added": 1,
+     "removed": 0
+    },
+    {
+     "id": "farmaciauniversal",
+     "name": "Farmacia Universal",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [],
+     "mechanics": 1,
+     "added": 0,
+     "removed": 0
+    },
+    {
+     "id": "estilos",
+     "name": "Estilos",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [
+      "Cyber",
+      "Liquidación"
+     ],
+     "mechanics": 4,
+     "added": 2,
+     "removed": 0
+    },
+    {
+     "id": "platanitos",
+     "name": "Platanitos",
+     "status": "ok",
+     "maxDiscount": null,
+     "campaigns": [
+      "Cyber Wow"
+     ],
+     "mechanics": 3,
+     "added": 1,
+     "removed": 1
+    }
+   ]
+  }
+ ]
+}
